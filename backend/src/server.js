@@ -18,7 +18,7 @@ async function startServer() {
         await connectDatabase();
 
         app.listen(PORT, () => {
-            console.log(`    TripSphere is Working💫  `);
+            console.log(`TripSphere is Working💫`);
         });
     } catch (error) {
         console.error("❌ Failed to start TripSphere server");
