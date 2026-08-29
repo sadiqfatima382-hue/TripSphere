@@ -54,3 +54,22 @@ export async function deleteUserRefreshTokens(userId) {
     },
   });
 }
+
+export async function findRefreshTokenWithUser(token) {
+  return prisma.refreshToken.findUnique({
+    where: {
+      token,
+    },
+    include: {
+      user: true,
+    },
+  });
+}
+
+export async function deleteRefreshTokenById(id) {
+  return prisma.refreshToken.delete({
+    where: {
+      id,
+    },
+  });
+}

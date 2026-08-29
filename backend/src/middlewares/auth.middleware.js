@@ -1,5 +1,5 @@
-import { verifyAccessToken } from "../utils/jwt";
-import { findUserById } from "../auth/auth.repository";
+import { verifyAccessToken } from "../utils/jwt.js";
+import { findUserById } from "../auth/auth.repository.js";
 import { success } from "zod";
 
 export async function authenticate(req, res, next) {
