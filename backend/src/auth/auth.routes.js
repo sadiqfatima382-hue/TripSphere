@@ -1,6 +1,7 @@
 import express from "express";
-import { register, login, refreshToken,logout} from "../auth/auth.controller.js";
+import { register, login, refreshToken, logout } from "../auth/auth.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js"
+import { authorizeRoles } from "../middlewares/role.middleware.js"
 const router = express.Router();
 
 router.post("/register", register);
@@ -18,4 +19,15 @@ router.get("/me", authenticate, async (req, res) => {
     });
 });
 
+router.get(
+    "/admin-test",
+    authenticate,
+    authorizeRoles("ADMIN"),
+    (req, res) => {
+        res.status(200).json({
+            success: true,
+            message: "Admin access granted",
+        });
+    }
+);
 export default router;
