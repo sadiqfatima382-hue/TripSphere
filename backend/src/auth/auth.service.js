@@ -169,3 +169,9 @@ export async function refreshUserToken(refreshToken) {
   };
 }
 
+export async function logoutUser(refreshToken) {
+    if (!refreshToken){
+        throw new Error("Refresh Token is required")
+    }
+    await deleteRefreshToken(refreshToken)
+}

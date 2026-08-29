@@ -1,5 +1,5 @@
 import { registerSchema, loginSchema, } from "../validators/auth/auth.validation.js";
-import { registerUser, loginUser, refreshUserToken } from "../auth/auth.service.js";
+import { registerUser, loginUser, refreshUserToken, logoutUser } from "../auth/auth.service.js";
 
 export async function register(req, res) {
     try {
@@ -68,6 +68,26 @@ export async function refreshToken(req, res) {
     console.error("Refresh token error:", error);
 
     res.status(401).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+export async function logout(req, res) {
+  try {
+    const { refreshToken } = req.body;
+
+    await logoutUser(refreshToken);
+
+    res.status(200).json({
+      success: true,
+      message: "Logout successful",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+
+    res.status(400).json({
       success: false,
       message: error.message,
     });
