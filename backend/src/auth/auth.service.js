@@ -1,6 +1,6 @@
-import { findUserByEmail, findUserById, createUser, findRefreshToken, createRefreshToken, deleteRefreshToken, deleteUserRefreshTokens } from "./auth.repository.js";
+import { findUserByEmail, findUserById, createUser, findRefreshToken, createRefreshToken, deleteRefreshToken, deleteUserRefreshTokens, findRefreshTokenWithUser, deleteRefreshTokenById } from "./auth.repository.js";
 import { hashPassword, comparePasswords } from "../utils/password.js"
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js"
+import {verifyRefreshToken, generateAccessToken, generateRefreshToken } from "../utils/jwt.js"
 import env from "../config/env.js";
 
 export async function registerUser(data) {
@@ -106,6 +106,66 @@ if (!user.isActive) {
     },
     accessToken,
     refreshToken,
+  };
+}
+
+export async function refreshUserToken(refreshToken) {
+  const storedToken = await findRefreshTokenWithUser(refreshToken);
+
+  if (!storedToken) {
+    throw new Error("Invalid refresh token");
+  }
+
+  if (storedToken.expiresAt < new Date()) {
+    await deleteRefreshTokenById(storedToken.id);
+
+    throw new Error("Refresh token expired");
+  }
+
+  const decoded = verifyRefreshToken(refreshToken);
+
+  if (decoded.userId !== storedToken.userId) {
+    throw new Error("Invalid refresh token");
+  }
+
+  const user = storedToken.user;
+
+  if (!user.isActive) {
+    throw new Error("User account is inactive");
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Refresh Token Rotation
+  |--------------------------------------------------------------------------
+  */
+
+  await deleteRefreshTokenById(storedToken.id);
+
+  const newAccessToken = generateAccessToken({
+    userId: user.id,
+    role: user.role,
+  });
+
+  const newRefreshToken = generateRefreshToken({
+    userId: user.id,
+  });
+
+  const refreshTokenExpiry = new Date();
+
+  refreshTokenExpiry.setDate(
+    refreshTokenExpiry.getDate() + 7
+  );
+
+  await createRefreshToken({
+    token: newRefreshToken,
+    userId: user.id,
+    expiresAt: refreshTokenExpiry,
+  });
+
+  return {
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
   };
 }
 
