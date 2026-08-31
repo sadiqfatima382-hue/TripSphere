@@ -6,28 +6,21 @@ datasource db {
   provider = "postgresql"
 }
 
-enum UserRole {
-  CUSTOMER
-  VENDOR
-  ADMIN
-  SUPPORT
-}
-
-
 model User {
-  id        String   @id @default(uuid())
+  id String @id @default(uuid())
 
   firstName String
   lastName  String
 
-  email     String   @unique
-  password  String
+  email    String @unique
+  password String
 
-  phone     String?
+  phone String?
 
-  role      UserRole @default(CUSTOMER)
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
 
-  isActive  Boolean  @default(true)
+  isActive Boolean @default(true)
 
   refreshTokens RefreshToken[]
 
@@ -35,25 +28,67 @@ model User {
   updatedAt DateTime @updatedAt
 
   @@index([email])
-  @@index([role])
+  @@index([roleId])
   @@map("users")
 }
 
+model Role {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  users       User[]
+  permissions RolePermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  roles RolePermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id String @id @default(uuid())
+
+  roleId       String
+  permissionId String
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
 model RefreshToken {
-  id        String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  token     String   @unique
+  token String @unique
 
-  userId    String
+  userId String
 
   expiresAt DateTime
 
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
   @@map("refresh_tokens")
 }
-

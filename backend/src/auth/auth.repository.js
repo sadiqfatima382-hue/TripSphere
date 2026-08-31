@@ -18,7 +18,23 @@ export async function findUserById(id) {
 
 export async function createUser(data) {
   return prisma.user.create({
-    data,
+    data: {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      password: data.password,
+      phone: data.phone,
+
+      role: {
+        connect: {
+          id: data.roleId,
+        },
+      },
+    },
+
+    include: {
+      role: true,
+    },
   });
 }
 
