@@ -5,6 +5,9 @@ export async function findUserByEmail(email) {
     where: {
       email,
     },
+    include: {
+      role: true,
+    },
   });
 }
 
@@ -77,7 +80,11 @@ export async function findRefreshTokenWithUser(token) {
       token,
     },
     include: {
-      user: true,
+      user: {
+        include: {
+          role: true,
+        },
+      },
     },
   });
 }
@@ -86,6 +93,14 @@ export async function deleteRefreshTokenById(id) {
   return prisma.refreshToken.delete({
     where: {
       id,
+    },
+  });
+}
+
+export async function findRoleByName(name) {
+  return prisma.role.findUnique({
+    where: {
+      name,
     },
   });
 }

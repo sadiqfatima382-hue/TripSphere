@@ -1,4 +1,4 @@
-import { findUserByEmail, findUserById, createUser, findRefreshToken, createRefreshToken, deleteRefreshToken, deleteUserRefreshTokens, findRefreshTokenWithUser, deleteRefreshTokenById, findRoleByName, } from "./auth.repository.js";
+import { findUserByEmail, findUserById, createUser, findRefreshToken, createRefreshToken, deleteRefreshToken, deleteUserRefreshTokens, findRefreshTokenWithUser, deleteRefreshTokenById, findRoleByName, } from "../auth/auth.repository.js";
 import { hashPassword, comparePasswords, } from "../utils/password.js";
 import { verifyRefreshToken, generateAccessToken, generateRefreshToken, } from "../utils/jwt.js";
 
