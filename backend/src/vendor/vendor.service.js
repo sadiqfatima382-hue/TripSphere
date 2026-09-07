@@ -1,5 +1,5 @@
-import { createVendor, findVendorById, findVendorByOwnerId, findVendorBySlug } from "./vendor.repository";
-import {generateSlug} from "../utils/slug";
+import { createVendor, findVendorById, findVendorByOwnerId, findVendorBySlug } from "./vendor.repository.js";
+import {generateSlug} from "../utils/slug.js";
 
 export async function createVendorService(ownerId , data) {
     const existingVendor = await findVendorByOwnerId(ownerId)
