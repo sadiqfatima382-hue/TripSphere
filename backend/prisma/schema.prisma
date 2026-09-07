@@ -6,6 +6,13 @@ datasource db {
   provider = "postgresql"
 }
 
+enum VendorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
 model User {
   id String @id @default(uuid())
 
@@ -23,6 +30,7 @@ model User {
   isActive Boolean @default(true)
 
   refreshTokens RefreshToken[]
+  vendor Vendor?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -92,3 +100,39 @@ model RefreshToken {
   @@index([expiresAt])
   @@map("refresh_tokens")
 }
+
+model Vendor {
+  id String @id @default(uuid())
+
+  ownerId String
+  owner   User @relation( fields: [ownerId],references: [id])
+
+  businessName String
+  slug         String @unique
+
+  description String?
+
+  email String
+  phone String?
+
+  website String?
+
+  logoUrl String?
+
+  country String?
+  city    String?
+  address String?
+
+  status VendorStatus @default(PENDING)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ownerId])
+  @@index([status])
+  @@index([businessName])
+  @@map("vendors")
+}
+
