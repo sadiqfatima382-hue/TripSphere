@@ -1,19 +1,5 @@
-import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import pg from "pg";
-
-const { Pool } = pg;
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
-const adapter = new PrismaPg(pool);
-
-const prisma = new PrismaClient({
-  adapter,
-});
+import prisma from "../src/config/prisma.js";
+import bcrypt from "bcrypt";
 
 async function main() {
   // =========================================================
@@ -176,12 +162,18 @@ async function main() {
     ),
 
     VENDOR: [
+      "vendors.read",
+      "vendors.create",
+      "vendors.update",
+
       "services.read",
       "services.create",
       "services.update",
       "services.delete",
+
       "bookings.read",
       "bookings.update",
+
       "payouts.read",
     ],
 
@@ -258,6 +250,50 @@ async function main() {
   console.log(
     "✅ Role permissions seeded successfully"
   );
+
+
+  // =========================================================
+  // 5. SEED VENDOR USER
+  // =========================================================
+
+  const vendorRole = await prisma.role.findUnique({
+    where: {
+      name: "VENDOR",
+    },
+  });
+
+  if (!vendorRole) {
+    throw new Error(
+      "VENDOR role not found"
+    );
+  }
+
+  const hashedPassword = await bcrypt.hash(
+    "Vendor123",
+    12
+  );
+
+  await prisma.user.upsert({
+    where: {
+      email: "vendor@tripsphere.com",
+    },
+    update: {
+      roleId: vendorRole.id,
+      isActive: true,
+    },
+    create: {
+      firstName: "TripSphere",
+      lastName: "Vendor",
+      email: "vendor@tripsphere.com",
+      password: hashedPassword,
+      roleId: vendorRole.id,
+      isActive: true,
+    },
+  });
+
+  console.log(
+    "✅ Vendor user seeded successfully"
+  );
 }
 
 
@@ -272,6 +308,4 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
-    await pool.end();
   });
-
