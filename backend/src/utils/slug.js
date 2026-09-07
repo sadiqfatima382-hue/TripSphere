@@ -1,4 +1,4 @@
-export async function generateSlug(value) {
+export function generateSlug(value) {
     return value 
     .toLowerCase()
     .trim()

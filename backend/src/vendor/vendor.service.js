@@ -1,24 +1,35 @@
-import { createVendor, findVendorById, findVendorByOwnerId, findVendorBySlug } from "./vendor.repository.js";
-import {generateSlug} from "../utils/slug.js";
+import {
+  createVendor,
+  findVendorById,
+  findVendorByOwnerId,
+  findVendorBySlug,
+} from "./vendor.repository.js";
 
-export async function createVendorService(ownerId , data) {
-    const existingVendor = await findVendorByOwnerId(ownerId)
+import { generateSlug } from "../utils/slug.js";
 
-    if(!existingVendor){
-        throw new Error ("Vendor Profile Alredy Exist")
-    }
-    
-    let Slug = generateSlug(data.businessName)
-    const existingSlug = await findVendorBySlug (Slug)
+export async function createVendorService(ownerId, data) {
+  // Check if owner already has a vendor profile
+  const existingVendor = await findVendorByOwnerId(ownerId);
 
-    if (existingSlug) {
-    Slug = `${Slug}-${Date.now()}`;
+  if (existingVendor) {
+    throw new Error("Vendor Profile Already Exists");
   }
 
-    return createVendor({
+  // Generate vendor slug
+  let slug = generateSlug(data.businessName);
+
+  // Check if slug already exists
+  const existingSlug = await findVendorBySlug(slug);
+
+  if (existingSlug) {
+    slug = `${slug}-${Date.now()}`;
+  }
+
+  // Create vendor
+  return createVendor({
     ownerId,
     businessName: data.businessName,
-    Slug,
+    slug,
     description: data.description,
     email: data.email,
     phone: data.phone,
