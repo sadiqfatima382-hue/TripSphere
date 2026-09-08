@@ -99,3 +99,32 @@ export const updateVendorSchema = z.object({
     .max(255)
     .optional(),
 });
+
+export const vendorQuerySchema = z.object({
+  page: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .default(1),
+
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(100)
+    .default(10),
+
+  status: z
+    .enum([
+      "PENDING",
+      "APPROVED",
+      "REJECTED",
+      "SUSPENDED",
+    ])
+    .optional(),
+
+  search: z
+    .string()
+    .trim()
+    .optional(),
+});
