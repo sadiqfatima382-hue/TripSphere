@@ -1,7 +1,7 @@
 import express from "express";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizePermission } from "../middlewares/permission.middleware.js";
-import { createVendor, getOwnVendor, getVendorById, updateOwnVendor, getVendors, approveVendor, rejectVendor, suspendVendor, } from "../controllers/vendor.controller.js";
+import { createVendor, getOwnVendor, getVendorById, updateOwnVendor, getVendors, approveVendor, rejectVendor, suspendVendor, } from "./vendor.controller.js";
 
 const router = express.Router();
 
