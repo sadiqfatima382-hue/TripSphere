@@ -11,7 +11,7 @@ export async function createVendor(req, res) {
       validatedData
     );
 
-    res.status(201).json({
+     return res.status(201).json({
       success: true,
       message: "Vendor profile created successfully",
       data: {
@@ -21,7 +21,7 @@ export async function createVendor(req, res) {
   } catch (error) {
     console.error("Create vendor error:", error);
 
-    res.status(400).json({
+   return res.status(400).json({
       success: false,
       message: error.message,
     });
