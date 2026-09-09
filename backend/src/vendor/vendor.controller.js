@@ -1,4 +1,4 @@
-import { createVendorSchema, updateVendorSchema } from "../validators/vendor/vendor.validations.js";
+import { createVendorSchema, updateVendorSchema, vendorQuerySchema } from "../validators/vendor/vendor.validations.js";
 import {  createVendorService, getOwnVendorService , getVendorByIdService,updateOwnVendorService,getVendorService,approveVendorService,suspendVendorService,rejectVendorService} from "./vendor.service.js";
 
 export async function createVendor(req, res) {
@@ -99,7 +99,7 @@ export async function getVendors(req, res) {
   try {
     const query = vendorQuerySchema.parse(req.query);
 
-    const result = await getVendorsService(query);
+    const result = await getVendorService(query);
 
     return res.status(200).json({
       success: true,

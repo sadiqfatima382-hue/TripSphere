@@ -128,3 +128,4 @@ export const vendorQuerySchema = z.object({
     .trim()
     .optional(),
 });
+
