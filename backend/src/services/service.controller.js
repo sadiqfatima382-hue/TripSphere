@@ -1,4 +1,4 @@
-import { createServiceService, getServiceByIdService, getOwnServiceService, getVendorServicesService, getServicesService, updateOwnServiceService, deleteOwnServiceService, } from "../services/service.service.js";
+import { createServiceService, getServicebyIdService, getOwnServiceService, getVendorServicesService, getServicesService, updateOwnServiceService, deleteOwnServiceService, } from "../services/service.service.js";
 
 
 export async function createService(req, res) {

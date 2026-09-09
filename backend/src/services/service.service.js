@@ -1,7 +1,7 @@
-import { createService, findServiceById, findServiceBySlug, findServicesByVendor, findAllServices, updateService, deleteService } from "./service.repository";
-import prisma from "../config/prisma";
-import { generateSlug } from "../utils/slug";
-import { id } from "zod/v4/locales";
+import { createService, findServiceById, findServiceBySlug, findServicesByVendor, findAllServices, updateService, deleteService } from "./service.repository.js";
+import prisma from "../config/prisma.js";
+import { generateSlug } from "../utils/slug.js";
+// import { id } from "zod";
 import { date } from "zod";
 
 export async function getApprovedVendors(vendorId) {
@@ -51,7 +51,7 @@ export async function generateUniqueServiceSlug(name) {
   return slug;
 }
 
-export async function createService(vendorId, categoryId) {
+export async function createServiceService(vendorId, categoryId) {
     await getApprovedVendors(vendorId)
     await getActiveCategory(categoryId)
     const slug = await generateUniqueServiceSlug(data.name);
@@ -84,7 +84,7 @@ export async function getServicebyIdService(id) {
     return service
 }
 
-export async function getOwnService (vendorId,serviceId) {
+export async function getOwnServiceService (vendorId,serviceId) {
     const service = await findServiceById(serviceId)
 
     if (!service){
