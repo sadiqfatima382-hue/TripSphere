@@ -1,4 +1,5 @@
 import prisma from "../src/config/prisma.js";
+import { seedServiceCategories } from "./seeders/serviceCategory.seeder.js";
 import bcrypt from "bcrypt";
 
 async function main() {
@@ -38,7 +39,6 @@ async function main() {
   }
 
   console.log("✅ Roles seeded successfully");
-
 
   // =========================================================
   // 2. SEED PERMISSIONS
@@ -151,7 +151,6 @@ async function main() {
 
   console.log("✅ Permissions seeded successfully");
 
-
   // =========================================================
   // 3. DEFINE ROLE PERMISSIONS
   // =========================================================
@@ -179,11 +178,14 @@ async function main() {
 
     CUSTOMER: [
       "services.read",
+
       "bookings.read",
       "bookings.create",
       "bookings.update",
       "bookings.cancel",
+
       "payments.read",
+
       "reviews.create",
     ],
 
@@ -196,7 +198,6 @@ async function main() {
       "payments.read",
     ],
   };
-
 
   // =========================================================
   // 4. CONNECT ROLES WITH PERMISSIONS
@@ -251,7 +252,6 @@ async function main() {
     "✅ Role permissions seeded successfully"
   );
 
-
   // =========================================================
   // 5. SEED VENDOR USER
   // =========================================================
@@ -294,47 +294,55 @@ async function main() {
   console.log(
     "✅ Vendor user seeded successfully"
   );
+
+  // =========================================================
+  // 6. SEED ADMIN USER
+  // =========================================================
+
+  const adminRole = await prisma.role.findUnique({
+    where: {
+      name: "ADMIN",
+    },
+  });
+
+  if (!adminRole) {
+    throw new Error(
+      "ADMIN role not found"
+    );
+  }
+
+  const adminHashedPassword =
+    await bcrypt.hash("Admin123", 12);
+
+  await prisma.user.upsert({
+    where: {
+      email: "admin@tripsphere.com",
+    },
+    update: {
+      roleId: adminRole.id,
+      isActive: true,
+    },
+    create: {
+      firstName: "TripSphere",
+      lastName: "Admin",
+      email: "admin@tripsphere.com",
+      password: adminHashedPassword,
+      roleId: adminRole.id,
+      isActive: true,
+    },
+  });
+
+  console.log(
+    "✅ Admin user seeded successfully"
+  );
+
+  // =========================================================
+  // 7. SEED SERVICE CATEGORIES
+  // =========================================================
+
+  await seedServiceCategories();
+
 }
-
-// =========================================================
-// 6. SEED ADMIN USER
-// =========================================================
-
-const adminRole = await prisma.role.findUnique({
-  where: {
-    name: "ADMIN",
-  },
-});
-
-if (!adminRole) {
-  throw new Error("ADMIN role not found");
-}
-
-const adminHashedPassword = await bcrypt.hash(
-  "Admin123",
-  12
-);
-
-await prisma.user.upsert({
-  where: {
-    email: "admin@tripsphere.com",
-  },
-  update: {
-    roleId: adminRole.id,
-    isActive: true,
-  },
-  create: {
-    firstName: "TripSphere",
-    lastName: "Admin",
-    email: "admin@tripsphere.com",
-    password: adminHashedPassword,
-    roleId: adminRole.id,
-    isActive: true,
-  },
-});
-
-console.log("✅ Admin user seeded successfully");
-
 
 // =========================================================
 // RUN SEED
@@ -342,7 +350,11 @@ console.log("✅ Admin user seeded successfully");
 
 main()
   .catch((error) => {
-    console.error("❌ Seed failed:", error);
+    console.error(
+      "❌ Seed failed:",
+      error
+    );
+
     process.exit(1);
   })
   .finally(async () => {
