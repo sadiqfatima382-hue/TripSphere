@@ -59,6 +59,7 @@ export async function authenticate(req, res, next) {
             id: user.id,
             email: user.email,
             role: user.role.name,
+            vendorId: user.vendor?.id ?? null,
         };
 
         // 9. Continue to next middleware/controller
