@@ -296,6 +296,45 @@ async function main() {
   );
 }
 
+// =========================================================
+// 6. SEED ADMIN USER
+// =========================================================
+
+const adminRole = await prisma.role.findUnique({
+  where: {
+    name: "ADMIN",
+  },
+});
+
+if (!adminRole) {
+  throw new Error("ADMIN role not found");
+}
+
+const adminHashedPassword = await bcrypt.hash(
+  "Admin123",
+  12
+);
+
+await prisma.user.upsert({
+  where: {
+    email: "admin@tripsphere.com",
+  },
+  update: {
+    roleId: adminRole.id,
+    isActive: true,
+  },
+  create: {
+    firstName: "TripSphere",
+    lastName: "Admin",
+    email: "admin@tripsphere.com",
+    password: adminHashedPassword,
+    roleId: adminRole.id,
+    isActive: true,
+  },
+});
+
+console.log("✅ Admin user seeded successfully");
+
 
 // =========================================================
 // RUN SEED

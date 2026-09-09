@@ -13,6 +13,14 @@ enum VendorStatus {
   SUSPENDED
 }
 
+enum ServiceStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
 model User {
   id String @id @default(uuid())
 
@@ -30,7 +38,7 @@ model User {
   isActive Boolean @default(true)
 
   refreshTokens RefreshToken[]
-  vendor Vendor?
+  vendor        Vendor?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -105,7 +113,7 @@ model Vendor {
   id String @id @default(uuid())
 
   ownerId String
-  owner   User @relation( fields: [ownerId],references: [id])
+  owner   User   @relation(fields: [ownerId], references: [id])
 
   businessName String
   slug         String @unique
@@ -123,7 +131,8 @@ model Vendor {
   city    String?
   address String?
 
-  status VendorStatus @default(PENDING)
+  status   VendorStatus @default(PENDING)
+  services Service[]
 
   isActive Boolean @default(true)
 
@@ -136,3 +145,62 @@ model Vendor {
   @@map("vendors")
 }
 
+model ServiceCategory {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+  icon        String?
+  isActive    Boolean @default(true)
+
+  services Service[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("service_categories")
+}
+
+model Service {
+  id String @id @default(uuid())
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   ServiceCategory @relation(fields: [categoryId], references: [id])
+
+  name        String
+  slug        String  @unique
+  description String?
+
+  // Pricing
+  basePrice Decimal @db.Decimal(12, 2)
+  currency  String  @default("USD")
+
+  // Location
+  country String?
+  city    String?
+  address String?
+
+  // Booking configuration
+  minBookingHours Int?
+  maxBookingHours Int?
+
+  // Service state
+  status ServiceStatus @default(DRAFT)
+
+  isActive Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([vendorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([isActive])
+  @@index([city])
+  @@index([country])
+  @@map("services")
+}
