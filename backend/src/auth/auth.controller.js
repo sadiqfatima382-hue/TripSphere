@@ -7,7 +7,7 @@ export async function register(req, res) {
 
         const result = await registerUser(validatedData);
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: "Registration successful",
             data: result,
@@ -15,7 +15,7 @@ export async function register(req, res) {
     } catch (error) {
         console.error("Register error:", error);
 
-        res.status(400).json({
+        return res.status(400).json({
             success: false,
             message: error.message,
         });
@@ -31,7 +31,7 @@ export async function login(req, res) {
             validatedData.password
         );
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: "Login successful",
             data: result,
@@ -39,7 +39,7 @@ export async function login(req, res) {
     } catch (error) {
         console.error("Login error:", error);
 
-        res.status(401).json({
+        return res.status(401).json({
             success: false,
             message: error.message,
         });
@@ -59,7 +59,7 @@ export async function refreshToken(req, res) {
 
     const result = await refreshUserToken(refreshToken);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Token refreshed successfully",
       data: result,
@@ -67,7 +67,7 @@ export async function refreshToken(req, res) {
   } catch (error) {
     console.error("Refresh token error:", error);
 
-    res.status(401).json({
+    return res.status(401).json({
       success: false,
       message: error.message,
     });
@@ -80,14 +80,14 @@ export async function logout(req, res) {
 
     await logoutUser(refreshToken);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Logout successful",
     });
   } catch (error) {
     console.error("Logout error:", error);
 
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
     });
