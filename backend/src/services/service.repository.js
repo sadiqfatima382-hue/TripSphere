@@ -266,3 +266,12 @@ export async function deleteService(id) {
     },
   });
 }
+
+export async function submitService(id) {
+  return prisma.service.update({
+    where: { id },
+    data: {
+      status: "PENDING",
+    },
+  });
+}
