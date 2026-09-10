@@ -2,34 +2,30 @@ import { createServiceService, getServicebyIdService, getOwnServiceService, getV
 
 
 export async function createService(req, res) {
-    try {
-        const vendorId = req.user.vendorId;
+  try {
+    const service = await createServiceService(
+      req.user.id,
+      req.body.categoryId,
+      req.body
+    );
 
-        const service = await createServiceService(
-            vendorId,
-            req.body
-        );
+    return res.status(201).json({
+      success: true,
+      message: "Service created successfully",
+      data: service,
+    });
+  } catch (error) {
+    console.error("Create service error:", error);
 
-        return res.status(201).json({
-            success: true,
-            message: "Service created successfully",
-            data: service,
-        });
-    } catch (error) {
-        console.error("Create service error:", error);
-
-        return res.status(400).json({
-            success: false,
-            message: error.message,
-        });
-    }
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
-
-
-
 export async function getServiceById(req, res) {
     try {
-        const service = await getServiceByIdService(
+        const service = await getServicebyIdService(
             req.params.id
         );
 

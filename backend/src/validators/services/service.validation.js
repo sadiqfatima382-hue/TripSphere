@@ -1,11 +1,5 @@
 import { z } from "zod";
 
-/**
- * =========================================================
- * CREATE SERVICE
- * =========================================================
- */
-
 export const createServiceSchema = z.object({
   categoryId: z
     .string()
@@ -83,13 +77,6 @@ export const createServiceSchema = z.object({
     path: ["maxBookingHours"],
   }
 );
-
-
-/**
- * =========================================================
- * UPDATE SERVICE
- * =========================================================
- */
 
 export const updateServiceSchema = z.object({
   categoryId: z
@@ -172,13 +159,6 @@ export const updateServiceSchema = z.object({
     path: ["maxBookingHours"],
   }
 );
-
-
-/**
- * =========================================================
- * SERVICE QUERY
- * =========================================================
- */
 
 export const serviceQuerySchema = z.object({
   page: z.coerce

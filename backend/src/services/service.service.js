@@ -1,41 +1,49 @@
-import { createService, findServiceById, findServiceBySlug, findServicesByVendor, findAllServices, updateService, deleteService } from "./service.repository.js";
+import {  createService,  findServiceById,  findServiceBySlug,  findServicesByVendor,  findAllServices,  updateService,  deleteService,} from "./service.repository.js";
 import prisma from "../config/prisma.js";
 import { generateSlug } from "../utils/slug.js";
-// import { id } from "zod";
-import { date } from "zod";
 
-export async function getApprovedVendors(vendorId) {
-   const vendor = await prisma.vendor.findUnique({
-    where: {id:vendorId}
-   })
-    if(!vendor) { 
-        throw new Error ("Vendor not found")
-    }
+export async function getApprovedVendor(ownerId) {
+  const vendor = await prisma.vendor.findUnique({
+    where: {
+      ownerId,
+    },
+  });
 
-    if (vendor.status!=="APPROVED"){
-        throw new Error ("Only Approved Vendors Can Create Services")
-    }
+  if (!vendor) {
+    throw new Error("Vendor not found");
+  }
 
-    if (vendor.isActive){
-        throw new Error("Account inactive")
-    }
-    return vendor;
+  if (vendor.status !== "APPROVED") {
+    throw new Error(
+      "Only Approved Vendors Can Create Services"
+    );
+  }
+
+  if (!vendor.isActive) {
+    throw new Error("Account inactive");
+  }
+
+  return vendor;
 }
 
 export async function getActiveCategory(categoryId) {
-    const category = await prisma.category.findUnique({
-        where: {id:categoryId}
-    })
+  const category = await prisma.serviceCategory.findUnique({
+    where: {
+      id: categoryId,
+    },
+  });
 
-    if (!category){
-        throw new Error ("Category not found")
-    }
+  if (!category) {
+    throw new Error("Category not found");
+  }
 
-    if(!category.isActive){
-        throw new Error("Service Category is inactive ")
-    }
-    return category;
+  if (!category.isActive) {
+    throw new Error("Service Category is inactive");
+  }
+
+  return category;
 }
+
 
 export async function generateUniqueServiceSlug(name) {
   const baseSlug = generateSlug(name);
@@ -51,14 +59,21 @@ export async function generateUniqueServiceSlug(name) {
   return slug;
 }
 
-export async function createServiceService(vendorId, categoryId) {
-    await getApprovedVendors(vendorId)
-    await getActiveCategory(categoryId)
-    const slug = await generateUniqueServiceSlug(data.name);
+export async function createServiceService(
+  ownerId,
+  categoryId,
+  data
+) {
+  
+  const vendor = await getApprovedVendor(ownerId);
 
-    return createService({
-    vendorId,
-    categoryId: data.categoryId,
+  await getActiveCategory(categoryId);
+
+  const slug = await generateUniqueServiceSlug(data.name);
+
+  return createService({
+    vendorId: vendor.id,
+    categoryId,
     name: data.name,
     slug,
     description: data.description,
@@ -76,25 +91,32 @@ export async function createServiceService(vendorId, categoryId) {
 }
 
 export async function getServicebyIdService(id) {
-    const service = await findServiceById(id)
+  const service = await findServiceById(id);
 
-    if(!service){
-        throw new Error("Service not found")
-    }
-    return service
+  if (!service) {
+    throw new Error("Service not found");
+  }
+
+  return service;
 }
 
-export async function getOwnServiceService (vendorId,serviceId) {
-    const service = await findServiceById(serviceId)
+export async function getOwnServiceService(
+  vendorId,
+  serviceId
+) {
+  const service = await findServiceById(serviceId);
 
-    if (!service){
-        throw new Error("Service not found")
-    }
-    
-    if (!service.vendorId===vendorId){
-        throw new Error("You are not authorized to access this service")
-    }
-    return service;
+  if (!service) {
+    throw new Error("Service not found");
+  }
+
+  if (service.vendorId !== vendorId) {
+    throw new Error(
+      "You are not authorized to access this service"
+    );
+  }
+
+  return service;
 }
 
 export async function getVendorServicesService({
@@ -103,8 +125,6 @@ export async function getVendorServicesService({
   limit,
   status,
 }) {
-  await getApprovedVendor(vendorId);
-
   const skip = (page - 1) * limit;
 
   const result = await findServicesByVendor({
@@ -190,20 +210,11 @@ export async function updateOwnServiceService(
     ...data,
   };
 
-  // Generate a new slug only when the name changes
-  if (data.name && data.name !== service.name) {
-    updateData.slug = await generateUniqueServiceSlug(
-      data.name
-    );
-  }
-
-  // A vendor update must not modify protected fields
   delete updateData.vendorId;
   delete updateData.status;
   delete updateData.isActive;
   delete updateData.slug;
 
-  // Re-add slug only if the name changed
   if (data.name && data.name !== service.name) {
     updateData.slug = await generateUniqueServiceSlug(
       data.name
@@ -212,7 +223,6 @@ export async function updateOwnServiceService(
 
   return updateService(serviceId, updateData);
 }
-
 
 export async function deleteOwnServiceService(
   vendorId,
@@ -238,3 +248,4 @@ export async function deleteOwnServiceService(
 
   return deleteService(serviceId);
 }
+
