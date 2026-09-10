@@ -1,4 +1,4 @@
-import { createServiceService, getServicebyIdService, getOwnServiceService, getVendorServicesService, getServicesService, updateOwnServiceService, deleteOwnServiceService, } from "../services/service.service.js";
+import { createServiceService, getServicebyIdService, getOwnServiceService, getVendorServicesService, getServicesService, updateOwnServiceService, deleteOwnServiceService, submitOwnServiceService} from "../services/service.service.js";
 
 
 export async function createService(req, res) {
@@ -255,4 +255,35 @@ export async function deleteOwnService(req, res) {
             message: error.message,
         });
     }
+}
+
+export async function submitOwnService(req, res) {
+  try {
+    const vendorId = req.user.vendorId;
+
+    if (!vendorId) {
+      return res.status(403).json({
+        success: false,
+        message: "Vendor profile not found",
+      });
+    }
+
+    const service = await submitOwnServiceService(
+      vendorId,
+      req.params.id
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Service submitted for approval",
+      data: service,
+    });
+  } catch (error) {
+    console.error("Submit service error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
