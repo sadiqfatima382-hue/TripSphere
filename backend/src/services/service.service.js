@@ -1,4 +1,4 @@
-import {  createService,  findServiceById,  findServiceBySlug,  findServicesByVendor,  findAllServices,  updateService,  deleteService,} from "./service.repository.js";
+import { createService, findServiceById, findServiceBySlug, findServicesByVendor, findAllServices, updateService, deleteService, submitService } from "./service.repository.js";
 import prisma from "../config/prisma.js";
 import { generateSlug } from "../utils/slug.js";
 
@@ -64,7 +64,7 @@ export async function createServiceService(
   categoryId,
   data
 ) {
-  
+
   const vendor = await getApprovedVendor(ownerId);
 
   await getActiveCategory(categoryId);
@@ -249,3 +249,27 @@ export async function deleteOwnServiceService(
   return deleteService(serviceId);
 }
 
+export async function submitOwnServiceService(
+  vendorId,
+  serviceId
+) {
+  const service = await findServiceById(serviceId);
+
+  if (!service) {
+    throw new Error("Service not found");
+  }
+
+  if (service.vendorId !== vendorId) {
+    throw new Error(
+      "You are not authorized to submit this service"
+    );
+  }
+
+  if (service.status !== "DRAFT") {
+    throw new Error(
+      "Only draft services can be submitted"
+    );
+  }
+
+  return submitService(serviceId);
+}
