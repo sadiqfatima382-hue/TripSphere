@@ -14,7 +14,13 @@ export function validate(schema, source = "body") {
         });
       }
 
-      req[source] = result.data;
+      if (source === "body") {
+        req.body = result.data;
+      } else if (source === "params") {
+        Object.assign(req.params, result.data);
+      } else if (source === "query") {
+        req.validatedQuery = result.data;
+      }
 
       next();
     } catch (error) {

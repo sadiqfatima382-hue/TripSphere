@@ -1,6 +1,8 @@
 import { findUserByEmail, findUserById, createUser, findRefreshToken, createRefreshToken, deleteRefreshToken, deleteUserRefreshTokens, findRefreshTokenWithUser, deleteRefreshTokenById, findRoleByName, } from "../auth/auth.repository.js";
 import { hashPassword, comparePasswords, } from "../utils/password.js";
 import { verifyRefreshToken, generateAccessToken, generateRefreshToken, } from "../utils/jwt.js";
+// import { id } from "zod/v4/locales";
+// import { email, id } from "zod";
 
 // REGISTER
 
@@ -34,13 +36,13 @@ export async function registerUser(data) {
 
   // Generate access token
   const accessToken = generateAccessToken({
-    userId: user.id,
+    id: user.id,
     role: user.role.name,
   });
 
   // Generate refresh token
   const refreshToken = generateRefreshToken({
-    userId: user.id,
+    id: user.id,
   });
 
   // Refresh token expiry
@@ -53,7 +55,7 @@ export async function registerUser(data) {
   // Store refresh token
   await createRefreshToken({
     token: refreshToken,
-    userId: user.id,
+    id: user.id,
     expiresAt: refreshTokenExpiry,
   });
 
