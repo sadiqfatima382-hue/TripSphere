@@ -12,6 +12,7 @@ router.get("/my-services", authenticate, authorizePermission("services.read"), v
 router.get("/", authenticate, authorizePermission("services.read"), validate(serviceQuerySchema, "query"), getServices);
 router.get("/my-services/:id", authenticate, authorizePermission("services.read"), getOwnService);
 router.get("/:id", authenticate, authorizePermission("services.read"), getServiceById);
+router.patch("/:id/submit", authenticate, authorizePermission("services.update"), submitOwnService);
 router.patch("/:id", authenticate, authorizePermission("services.update"), validate(updateServiceSchema), updateOwnService);
 router.delete("/:id", authenticate, authorizePermission("services.delete"), deleteOwnService);
 
