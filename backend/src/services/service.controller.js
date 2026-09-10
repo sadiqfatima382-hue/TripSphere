@@ -72,66 +72,133 @@ export async function getOwnService(req, res) {
 
 
 
+// export async function getVendorServices(req, res) {
+//     try {
+//         const vendorId = req.user.vendorId;
+
+//         const result =
+//             await getVendorServicesService({
+//                 vendorId,
+//                 page: req.query.page,
+//                 limit: req.query.limit,
+//                 status: req.query.status,
+//             });
+
+//         return res.status(200).json({
+//             success: true,
+//             message: "Vendor services retrieved successfully",
+//             data: result,
+//         });
+//     } catch (error) {
+//         console.error(
+//             "Get vendor services error:",
+//             error
+//         );
+
+//         return res.status(400).json({
+//             success: false,
+//             message: error.message,
+//         });
+//     }
+// }
 export async function getVendorServices(req, res) {
-    try {
-        const vendorId = req.user.vendorId;
+  try {
+    const vendorId = req.user.vendorId;
 
-        const result =
-            await getVendorServicesService({
-                vendorId,
-                page: req.query.page,
-                limit: req.query.limit,
-                status: req.query.status,
-            });
+    const {
+      page,
+      limit,
+      status,
+    } = req.validatedQuery;
 
-        return res.status(200).json({
-            success: true,
-            message: "Vendor services retrieved successfully",
-            data: result,
-        });
-    } catch (error) {
-        console.error(
-            "Get vendor services error:",
-            error
-        );
+    const result = await getVendorServicesService({
+      vendorId,
+      page,
+      limit,
+      status,
+    });
 
-        return res.status(400).json({
-            success: false,
-            message: error.message,
-        });
-    }
+    return res.status(200).json({
+      success: true,
+      message: "Vendor services retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.error("Get vendor services error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
 
 
+// export async function getServices(req, res) {
+//     try {
+//         const result = await getServicesService({
+//             page: req.query.page,
+//             limit: req.query.limit,
+//             categoryId: req.query.categoryId,
+//             vendorId: req.query.vendorId,
+//             status: req.query.status,
+//             country: req.query.country,
+//             city: req.query.city,
+//             search: req.query.search,
+//         });
 
+//         return res.status(200).json({
+//             success: true,
+//             message: "Services retrieved successfully",
+//             data: result,
+//         });
+//     } catch (error) {
+//         console.error("Get services error:", error);
+
+//         return res.status(400).json({
+//             success: false,
+//             message: error.message,
+//         });
+//     }
+// }
 export async function getServices(req, res) {
-    try {
-        const result = await getServicesService({
-            page: req.query.page,
-            limit: req.query.limit,
-            categoryId: req.query.categoryId,
-            vendorId: req.query.vendorId,
-            status: req.query.status,
-            country: req.query.country,
-            city: req.query.city,
-            search: req.query.search,
-        });
+  try {
+    const {
+      page,
+      limit,
+      categoryId,
+      vendorId,
+      status,
+      country,
+      city,
+      search,
+    } = req.validatedQuery;
 
-        return res.status(200).json({
-            success: true,
-            message: "Services retrieved successfully",
-            data: result,
-        });
-    } catch (error) {
-        console.error("Get services error:", error);
+    const result = await getServicesService({
+      page,
+      limit,
+      categoryId,
+      vendorId,
+      status,
+      country,
+      city,
+      search,
+    });
 
-        return res.status(400).json({
-            success: false,
-            message: error.message,
-        });
-    }
+    return res.status(200).json({
+      success: true,
+      message: "Services retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.error("Get services error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
-
 
 
 export async function updateOwnService(req, res) {
