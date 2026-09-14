@@ -296,3 +296,13 @@ export async function rejectService(id) {
     },
   });
 }
+
+export async function suspendService(id) {
+  return prisma.service.update({
+    where: { id },
+    data: {
+      status: "SUSPENDED",
+      isActive: false,
+    },
+  });
+}
