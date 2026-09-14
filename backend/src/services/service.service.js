@@ -1,4 +1,4 @@
-import { createService, findServiceById, findServiceBySlug, findServicesByVendor, findAllServices, updateService, deleteService, submitService, approveService } from "./service.repository.js";
+import { createService, findServiceById, findServiceBySlug, findServicesByVendor, findAllServices, updateService, deleteService, submitService, approveService, rejectService } from "./service.repository.js";
 import prisma from "../config/prisma.js";
 import { generateSlug } from "../utils/slug.js";
 

@@ -1,5 +1,5 @@
 import express from "express";
-import { createService, getServiceById, getOwnService, getVendorServices, getServices, updateOwnService, deleteOwnService, submitOwnService, approveService } from "./service.controller.js";
+import { createService, getServiceById, getOwnService, getVendorServices, getServices, updateOwnService, deleteOwnService, submitOwnService, approveService, rejectService } from "./service.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizePermission } from "../middlewares/permission.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
@@ -14,6 +14,7 @@ router.get("/my-services/:id", authenticate, authorizePermission("services.read"
 router.get("/:id", authenticate, authorizePermission("services.read"), getServiceById);
 router.patch("/:id/approve", authenticate, authorizePermission("services.update"), approveService);
 router.patch("/:id/submit", authenticate, authorizePermission("services.update"), submitOwnService);
+router.patch("/:id/reject", authenticate, authorizePermission("services.update"), rejectService);
 router.patch("/:id", authenticate, authorizePermission("services.update"), validate(updateServiceSchema), updateOwnService);
 router.delete("/:id", authenticate, authorizePermission("services.delete"), deleteOwnService);
 
