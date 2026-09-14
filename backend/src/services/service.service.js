@@ -276,6 +276,9 @@ export async function submitOwnServiceService(
 
 export async function approveServiceService(serviceId) {
   const service = await findServiceById(serviceId);
+  console.log("SERVICE VENDOR:", service.vendor);
+console.log("VENDOR STATUS:", service.vendor?.status);
+console.log("VENDOR ACTIVE:", service.vendor?.isActive);
 
   if (!service){
     throw new Error ("Service not Found")

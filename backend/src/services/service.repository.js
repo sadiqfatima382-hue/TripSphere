@@ -38,6 +38,7 @@ export async function findServiceById(id) {
           businessName: true,
           slug: true,
           status: true,
+          isActive:true,
         },
       },
 
@@ -281,7 +282,17 @@ export async function approveService(id) {
     where: { id },
     data: {
       status: "PENDING",
-      isActive: true
+      isActive: true,
+    },
+  });
+}
+
+export async function rejectService(id) {
+  return prisma.service.update({
+    where: { id },
+    data: {
+      status: "REJECTED",
+      isActive: false,
     },
   });
 }
