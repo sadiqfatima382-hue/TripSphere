@@ -301,3 +301,19 @@ console.log("VENDOR ACTIVE:", service.vendor?.isActive);
   }
   return approveService(serviceId)
 }
+
+export async function rejectServiceService(serviceId) {
+  const service = await findServiceById(serviceId);
+
+  if (!service) {
+    throw new Error("Service not found");
+  }
+
+  if (service.status !== "PENDING") {
+    throw new Error(
+      "Only pending services can be rejected"
+    );
+  }
+
+  return rejectService(serviceId);
+}
