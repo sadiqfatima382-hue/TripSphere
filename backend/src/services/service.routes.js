@@ -1,5 +1,5 @@
 import express from "express";
-import { createService, getServiceById, getOwnService, getVendorServices, getServices, updateOwnService, deleteOwnService, } from "./service.controller.js";
+import { createService, getServiceById, getOwnService, getVendorServices, getServices, updateOwnService, deleteOwnService, submitOwnService } from "./service.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizePermission } from "../middlewares/permission.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";

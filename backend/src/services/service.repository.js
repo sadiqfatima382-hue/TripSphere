@@ -275,3 +275,13 @@ export async function submitService(id) {
     },
   });
 }
+
+export async function approveService(id) {
+  return prisma.service.update({
+    where: { id },
+    data: {
+      status: "PENDING",
+      isActive: true
+    },
+  });
+}
