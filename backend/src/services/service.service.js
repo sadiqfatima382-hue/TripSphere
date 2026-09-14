@@ -1,4 +1,4 @@
-import { createService, findServiceById, findServiceBySlug, findServicesByVendor, findAllServices, updateService, deleteService, submitService } from "./service.repository.js";
+import { createService, findServiceById, findServiceBySlug, findServicesByVendor, findAllServices, updateService, deleteService, submitService, approveService } from "./service.repository.js";
 import prisma from "../config/prisma.js";
 import { generateSlug } from "../utils/slug.js";
 
@@ -272,4 +272,29 @@ export async function submitOwnServiceService(
   }
 
   return submitService(serviceId);
+}
+
+export async function approveServiceService(serviceId) {
+  const service = await findServiceById(serviceId);
+
+  if (!service){
+    throw new Error ("Service not Found")
+  }
+
+  if (service.status !== "PENDING") {
+    throw new Error (
+      "Only pending services can be approved"
+    )
+  }
+
+  if (service.vendor.status !== "APPROVED"){
+    throw new Error("Service vendor is not approved");
+    
+  }
+
+  if (!service.vendor.isActive){
+    throw new Error("Service vendor is inactive");
+    
+  }
+  return approveService(serviceId)
 }
