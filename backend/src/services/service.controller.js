@@ -1,4 +1,4 @@
-import { createServiceService, getServicebyIdService, getOwnServiceService, getVendorServicesService, getServicesService, updateOwnServiceService, deleteOwnServiceService, submitOwnServiceService} from "../services/service.service.js";
+import { createServiceService, getServicebyIdService, getOwnServiceService, getVendorServicesService, getServicesService, updateOwnServiceService, deleteOwnServiceService, submitOwnServiceService, approveServiceService} from "../services/service.service.js";
 
 
 export async function createService(req, res) {
@@ -280,6 +280,27 @@ export async function submitOwnService(req, res) {
     });
   } catch (error) {
     console.error("Submit service error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+export async function approveService(req, res) {
+  try {
+    const service = await approveServiceService(
+      req.params.id
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Service approved successfully",
+      data: service,
+    });
+  } catch (error) {
+    console.error("Approve service error:", error);
 
     return res.status(400).json({
       success: false,
