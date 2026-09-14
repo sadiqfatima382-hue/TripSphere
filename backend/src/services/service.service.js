@@ -1,4 +1,4 @@
-import { createService, findServiceById, findServiceBySlug, findServicesByVendor, findAllServices, updateService, deleteService, submitService, approveService, rejectService } from "./service.repository.js";
+import { createService, findServiceById, findServiceBySlug, findServicesByVendor, findAllServices, updateService, deleteService, submitService, approveService, rejectService, suspendService } from "./service.repository.js";
 import prisma from "../config/prisma.js";
 import { generateSlug } from "../utils/slug.js";
 
@@ -316,4 +316,20 @@ export async function rejectServiceService(serviceId) {
   }
 
   return rejectService(serviceId);
+}
+
+export async function suspendServiceService(serviceId) {
+  const service = await findServiceById(serviceId);
+
+  if (!service) {
+    throw new Error("Service not found");
+  }
+
+  if (service.status !== "APPROVED") {
+    throw new Error(
+      "Only approved services can be suspended"
+    );
+  }
+
+  return suspendService(serviceId);
 }
