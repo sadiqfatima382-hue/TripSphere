@@ -114,6 +114,11 @@ async function main() {
     },
 
     {
+      name: "bookings.delete",
+      description: "Delete bookings",
+    },
+
+    {
       name: "payments.read",
       description: "View payments",
     },
