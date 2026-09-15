@@ -21,6 +21,13 @@ enum ServiceStatus {
   SUSPENDED
 }
 
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 model User {
   id String @id @default(uuid())
 
@@ -39,6 +46,7 @@ model User {
 
   refreshTokens RefreshToken[]
   vendor        Vendor?
+  bookings      Booking[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -133,6 +141,7 @@ model Vendor {
 
   status   VendorStatus @default(PENDING)
   services Service[]
+  bookings Booking[]
 
   isActive Boolean @default(true)
 
@@ -191,7 +200,8 @@ model Service {
   // Service state
   status ServiceStatus @default(DRAFT)
 
-  isActive Boolean @default(false)
+  isActive Boolean   @default(false)
+  bookings Booking[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -203,4 +213,43 @@ model Service {
   @@index([city])
   @@index([country])
   @@map("services")
+}
+
+model Booking {
+  id String @id @default(uuid())
+
+  bookingNumber String @unique
+
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id])
+
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id])
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  startDate DateTime
+  endDate   DateTime?
+
+  quantity Int @default(1)
+
+  unitPrice  Decimal @db.Decimal(12, 2)
+  totalPrice Decimal @db.Decimal(12, 2)
+  currency   String  @default("USD")
+
+  status BookingStatus @default(PENDING)
+
+  customerNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([serviceId])
+  @@index([vendorId])
+  @@index([status])
+  @@index([startDate])
+  @@index([bookingNumber])
+  @@map("bookings")
 }
