@@ -1,4 +1,4 @@
-import { createBookingService, getBookingByIdService, getBookingByNumberService, getCustomerBookingsService, getVendorBookingsService, getAllBookingsService, confirmBookingService, cancelBookingService, completeBookingService, deleteBookingService, } from "../services/booking.service.js";
+import { createBookingService, getBookingByIdService, getBookingByNumberService, getCustomerBookingsService, getVendorBookingsService, getAllBookingsService, confirmBookingService, cancelBookingService, completeBookingService, deleteBookingService, } from "../booking/booking.service.js";
 
 export async function createBooking(req, res, next) {
     try {

@@ -6,6 +6,7 @@ import env from "./config/env.js";
 import authRoutes from "./auth/auth.routes.js";
 import vendorRoutes from "./vendor/vendor.routes.js"
 import serviceRoutes from "./services/service.routes.js";
+import bookingRoutes from "./booking/booking.routes.js";
 const app = express();
 app.use(helmet());
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/vendors", vendorRoutes)
 app.use("/api/v1/services", serviceRoutes);
+app.use("/api/v1/bookings", bookingRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
