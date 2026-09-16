@@ -281,7 +281,7 @@ export async function approveService(id) {
   return prisma.service.update({
     where: { id },
     data: {
-      status: "PENDING",
+      status: "APPROVED",
       isActive: true,
     },
   });

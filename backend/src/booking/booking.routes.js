@@ -20,9 +20,11 @@ router.patch("/:id/confirm", authenticate, authorizePermission("bookings.update"
 
 router.patch("/:id/complete", authenticate, authorizePermission("bookings.update"), completeBooking);
 
-router.get("/", authenticate, authorizePermission("bookings.read"), validate(bookingQuerySchema, "query"), getAllBookings);
+// router.get("/", authenticate, authorizePermission("bookings.read"), validate(bookingQuerySchema, "query"), getAllBookings);
 
 router.get("/number/:bookingNumber", authenticate, authorizePermission("bookings.read"), getBookingByNumber);
+
+router.get("/vendor", authenticate, authorizePermission("bookings.read"), validate(bookingQuerySchema, "query"), getVendorBookings);
 
 router.get("/:id", authenticate, authorizePermission("bookings.read"), getBookingById);
 
