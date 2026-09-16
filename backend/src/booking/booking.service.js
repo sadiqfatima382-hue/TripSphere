@@ -1,14 +1,15 @@
-import { createBooking, findAllBookings, findBookingByBookingNumber,findBookingById, findBookingsByCustomer, findBookingsByVendor,updateBooking,deleteBooking } from "./booking.repository.js";
+import { createBooking, findAllBookings, findBookingByBookingNumber, findBookingById, findBookingsByCustomer, findBookingsByVendor, updateBooking, deleteBooking } from "./booking.repository.js";
 import prisma from "../config/prisma.js";
-import { date } from "zod";
 
 function generateBookingNumber() {
-    const timestamp = Date.now();
-    const random = Math.floor(1000 + Math.random() * 9000)
+  const timestamp = Date.now();
+  const random = Math.floor(1000 + Math.random() * 9000);
+
+  return `TS-${timestamp}-${random}`;
 }
 
 export async function createBookingService(customerId, data) {
-  const {    serviceId,    startDate,    endDate,    quantity,    customerNote,  } = data;
+  const { serviceId, startDate, endDate, quantity, customerNote, } = data;
 
   const service = await prisma.service.findUnique({
     where: {
@@ -55,18 +56,13 @@ export async function createBookingService(customerId, data) {
     customerId,
     serviceId,
     vendorId: service.vendorId,
-
     startDate,
     endDate,
-
     quantity,
-
     unitPrice,
     totalPrice,
     currency: service.currency,
-
     status: "PENDING",
-
     customerNote,
   });
 
@@ -124,7 +120,7 @@ export async function getCustomerBookingsService(
       totalPages: Math.ceil(total / limit),
     },
   };
-}  
+}
 
 export async function getVendorBookingsService(
   vendorId,

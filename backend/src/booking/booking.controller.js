@@ -13,10 +13,9 @@ export async function createBooking(req, res, next) {
             data: booking,
         });
     } catch (error) {
-        return res.status(201).json({
+        return res.status(500).json({
             success: false,
-            message: message.error,
-            data: booking,
+            message: error.message,
         })
     }
 }
@@ -33,10 +32,9 @@ export async function getBookingById(req, res, next) {
             data: booking,
         });
     } catch (error) {
-        return res.status(201).json({
+        return res.status(500).json({
             success: false,
-            message: message.error,
-            data: booking,
+            message: error.message,
         })
     }
 }
@@ -53,10 +51,9 @@ export async function getBookingByNumber(req, res, next) {
             data: booking,
         });
     } catch (error) {
-        return res.status(201).json({
+        return res.status(500).json({
             success: false,
-            message: message.error,
-            data: booking,
+            message: error.message,
         })
     }
 }
@@ -75,10 +72,9 @@ export async function getCustomerBookings(req, res, next) {
             data: result,
         });
     } catch (error) {
-        return res.status(201).json({
+        return res.status(500).json({
             success: false,
-            message: message.error,
-            data: result,
+            message: error.message,
         })
     }
 }
@@ -98,10 +94,9 @@ export async function getVendorBookings(
             data: result,
         });
     } catch (error) {
-        return res.status(201).json({
+        return res.status(500).json({
             success: false,
-            message: message.error,
-            data: result,
+            message: error.message,
         })
     }
 }
@@ -118,10 +113,9 @@ export async function getAllBookings(req, res, next) {
             data: result,
         });
     } catch (error) {
-        return res.status(201).json({
+        return res.status(500).json({
             success: false,
-            message: message.error,
-            data: result,
+            message: error.message,
         })
     }
 }
@@ -139,10 +133,9 @@ export async function confirmBooking(req, res, next) {
             data: booking,
         });
     } catch (error) {
-        return res.status(201).json({
+        return res.status(500).json({
             success: false,
-            message: message.error,
-            data: booking,
+            message: error.message,
         })
     }
 }
@@ -161,10 +154,9 @@ export async function cancelBooking(req, res, next) {
             data: booking,
         });
     } catch (error) {
-        return res.status(201).json({
+        return res.status(500).json({
             success: false,
-            message: message.error,
-            data: booking,
+            message: error.message,
         })
     }
 }
@@ -182,10 +174,9 @@ export async function completeBooking(req, res, next) {
             data: booking,
         });
     } catch (error) {
-        return res.status(201).json({
+        return res.status(500).json({
             success: false,
-            message: message.error,
-            data: booking,
+            message: error.message,
         })
     }
 }
@@ -200,10 +191,9 @@ export async function deleteBooking(req, res, next) {
             data: booking,
         });
     } catch (error) {
-        return res.status(201).json({
+        return res.status(500).json({
             success: false,
-            message: message.error,
-            data: booking,
+            message: error.message,
         })
     }
 }
