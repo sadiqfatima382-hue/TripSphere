@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post("/", authenticate, authorizePermission("payments.read"), validate(createPaymentSchema), createPayment);
 router.get("/my-payments", authenticate, authorizePermission("payments.read"), validate(paymentQuerySchema, "query"), getCustomerPayments);
-router.get("/:id", authenticate, authorizePermission("payments.read"), getPaymentById);
+router.get("/:id", authenticate, authorizePermission("payments.create"), getPaymentById);
 router.get("/", authenticate, authorizePermission("payments.read"), validate(paymentQuerySchema, "query"), getAllPayments);
 router.delete("/:id", authenticate, authorizePermission("payments.read"), deletePayment);
 
