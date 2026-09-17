@@ -1,5 +1,5 @@
 import express from "express";
-import { createPayment, getPaymentById, getCustomerPayments, getAllPayments, deletePayment, } from "../payment/payment.controller.js";
+import { createPayment, getPaymentById, getCustomerPayments, getAllPayments, deletePayment, } from "./payment.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizePermission } from "../middlewares/permission.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";

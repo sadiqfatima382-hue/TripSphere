@@ -13,7 +13,10 @@ export const createPayment = async (req, res, next) => {
             data: payment,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
     }
 };
 
@@ -32,7 +35,10 @@ export const getPaymentById = async (req, res, next) => {
             data: payment,
         });
     } catch (error) {
-        next(error);
+       return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
     }
 };
 
@@ -53,7 +59,10 @@ export const getCustomerPayments = async (req, res, next) => {
             pagination: result.pagination,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
     }
 };
 
@@ -69,7 +78,10 @@ export const getAllPayments = async (req, res, next) => {
             pagination: result.pagination,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
     }
 };
 
@@ -83,6 +95,9 @@ export const deletePayment = async (req, res, next) => {
             message: "Payment deleted successfully",
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
     }
 };
