@@ -139,7 +139,7 @@ async function main() {
     {
       name: "payments.create",
       description: "Create payments"
-    }
+    },
 
     {
       name: "payouts.read",
