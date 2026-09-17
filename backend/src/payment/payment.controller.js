@@ -1,4 +1,4 @@
-import { createPaymentService, getPaymentByIdService, getCustomerPaymentsService, getAllPaymentsService, deletePaymentService, } from "../services/payment.service.js";
+import { createPaymentService, getPaymentByIdService, getCustomerPaymentsService, getAllPaymentsService, deletePaymentService, } from "../payment/payment.service.js";
 
 // Create Payment
 export const createPayment = async (req, res, next) => {
