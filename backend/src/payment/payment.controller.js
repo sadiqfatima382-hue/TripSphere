@@ -1,5 +1,5 @@
 import { createPaymentService, getPaymentByIdService, getCustomerPaymentsService, getAllPaymentsService, deletePaymentService, } from "../payment/payment.service.js";
-
+import { createStripeCheckoutSessionService } from "./stripe.service.js";
 // Create Payment
 export const createPayment = async (req, res, next) => {
     try {
@@ -100,4 +100,24 @@ export const deletePayment = async (req, res, next) => {
             message: error.message,
         })
     }
+};
+
+export const createCheckoutSession = async (req, res, next) => {
+  try {
+    const paymentId = req.params.id;
+    const customerId = req.user.id;
+
+    const session = await createStripeCheckoutSessionService(
+      paymentId,
+      customerId
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Stripe Checkout session created successfully",
+      data: session,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
