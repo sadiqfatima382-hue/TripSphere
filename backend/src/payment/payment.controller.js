@@ -121,3 +121,31 @@ export const createCheckoutSession = async (req, res, next) => {
     next(error);
   }
 };
+export const paymentSuccess = async (req, res) => {
+  return res.status(200).send(`
+    <html>
+      <head>
+        <title>Payment Successful</title>
+      </head>
+      <body>
+        <h1>Payment Successful ✅</h1>
+        <p>Your Stripe payment was completed.</p>
+        <p>Session ID: ${req.query.session_id ?? "Not provided"}</p>
+      </body>
+    </html>
+  `);
+};
+
+export const paymentCancel = async (req, res) => {
+  return res.status(200).send(`
+    <html>
+      <head>
+        <title>Payment Cancelled</title>
+      </head>
+      <body>
+        <h1>Payment Cancelled ❌</h1>
+        <p>Your payment was cancelled.</p>
+      </body>
+    </html>
+  `);
+};

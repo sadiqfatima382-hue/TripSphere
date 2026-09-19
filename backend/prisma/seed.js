@@ -137,8 +137,16 @@ async function main() {
     },
 
     {
+      name: "payments.read",
+      description: "View payments",
+    },
+    {
       name: "payments.create",
-      description: "Create payments"
+      description: "Create payments",
+    },
+    {
+      name: "payments.refund",
+      description: "Refund payments",
     },
 
     {
@@ -188,11 +196,13 @@ async function main() {
 
     CUSTOMER: [
       "services.read",
-
       "bookings.read",
       "bookings.create",
       "bookings.update",
       "bookings.cancel",
+      "payments.read",
+      "payments.create",
+      "reviews.create",
 
       "payments.read",
 
