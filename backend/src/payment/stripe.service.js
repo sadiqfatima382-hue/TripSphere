@@ -103,4 +103,9 @@ export const createStripeCheckoutSessionService = async (
       `${process.env.CLIENT_URL}/payment/cancel` +
       `?payment_id=${payment.id}`,
   });
+
+  return {
+    sessionId: session.id,
+    checkoutUrl: session.url,
+  };
 }
