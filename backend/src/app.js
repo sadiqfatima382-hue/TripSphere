@@ -8,6 +8,7 @@ import vendorRoutes from "./vendor/vendor.routes.js"
 import serviceRoutes from "./services/service.routes.js";
 import bookingRoutes from "./booking/booking.routes.js";
 import paymentRoutes from "./payment/payment.routes.js";
+import stripeRoutes from "./payment/stripe.routes.js";
 const app = express();
 app.use(helmet());
 
@@ -17,6 +18,7 @@ app.use(cors({
 }));
 
 app.use(morgan("dev"));
+app.use("/api/v1/payments/stripe", stripeRoutes);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
