@@ -57,35 +57,43 @@ export const createStripeCheckoutSessionService = async (
   const unitAmount = Math.round(amount * 100);
 
   // 7. Create Stripe Checkout Session
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
+ const session = await stripe.checkout.sessions.create({
+  mode: "payment",
 
-    payment_method_types: ["card"],
+  payment_method_types: ["card"],
 
-    line_items: [
-      {
-        price_data: {
-          currency: payment.currency.toLowerCase(),
+  line_items: [
+    {
+      price_data: {
+        currency: payment.currency.toLowerCase(),
 
-          product_data: {
-            name: payment.booking.service.name,
-            description: `Booking #${payment.booking.bookingNumber}`,
-          },
-
-          unit_amount: unitAmount,
+        product_data: {
+          name: payment.booking.service.name,
+          description: `Booking #${payment.booking.bookingNumber}`,
         },
 
-        quantity: 1,
+        unit_amount: unitAmount,
       },
-    ],
 
-    customer_email: payment.customer.email,
+      quantity: 1,
+    },
+  ],
 
+  customer_email: payment.customer.email,
+
+  metadata: {
+    paymentId: payment.id,
+    bookingId: payment.bookingId,
+    customerId: payment.customerId,
+  },
+
+  payment_intent_data: {
     metadata: {
       paymentId: payment.id,
       bookingId: payment.bookingId,
       customerId: payment.customerId,
     },
+  },
 
     success_url:
       `${process.env.CLIENT_URL}/payment/success` +
@@ -95,9 +103,4 @@ export const createStripeCheckoutSessionService = async (
       `${process.env.CLIENT_URL}/payment/cancel` +
       `?payment_id=${payment.id}`,
   });
-
-  return {
-    sessionId: session.id,
-    checkoutUrl: session.url,
-  };
-};
+}
