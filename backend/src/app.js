@@ -10,6 +10,7 @@ import bookingRoutes from "./booking/booking.routes.js";
 import paymentRoutes from "./payment/payment.routes.js";
 import stripeRoutes from "./payment/stripe.routes.js";
 const app = express();
+app.use("/api/v1/payments/stripe", stripeRoutes);
 app.use(helmet());
 
 app.use(cors({
@@ -18,7 +19,6 @@ app.use(cors({
 }));
 
 app.use(morgan("dev"));
-app.use("/api/v1/payments/stripe", stripeRoutes);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
