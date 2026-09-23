@@ -1,4 +1,4 @@
-import { searchServices } from "../repositories/search.repository.js";
+import { searchServices } from "../searching/search.repository.js";
 
 export const searchServicesService = async (query) => {
   const {
