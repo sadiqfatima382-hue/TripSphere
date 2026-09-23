@@ -10,6 +10,7 @@ import bookingRoutes from "./booking/booking.routes.js";
 import paymentRoutes from "./payment/payment.routes.js";
 import stripeRoutes from "./payment/stripe.routes.js";
 import reviewRoutes from "./review/review.routes.js";
+import searchRoutes from "./searching/search.routes.js";
 const app = express();
 app.use("/api/v1/payments/stripe", stripeRoutes);
 app.use(helmet());
@@ -30,6 +31,7 @@ app.use("/api/v1/services", serviceRoutes);
 app.use("/api/v1/bookings", bookingRoutes);
 app.use("/api/v1/payments", paymentRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
+app.use("/api/v1/search", searchRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
