@@ -14,6 +14,6 @@ router.delete("/:id", authenticate, authorizePermission("reviews.create"), delet
 router.get("/service/:serviceId", validate(reviewQuerySchema, "query"), getServiceReviews);
 router.get("/", authenticate, authorizePermission("reviews.moderate"), validate(reviewQuerySchema, "query"), getAllReviews);
 router.patch("/:id/moderate", authenticate, authorizePermission("reviews.moderate"), moderateReview);
-router.get("/:id", authenticate, authorizePermission("reviews.create"), getReviewById);
 router.patch(  "/:id/moderate",  authenticate,  authorizePermission("reviews.moderate"),  validate(moderateReviewSchema),  moderateReview);
+router.get("/:id", authenticate, authorizePermission("reviews.create"), getReviewById);
 export default router;
