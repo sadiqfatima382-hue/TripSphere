@@ -1,10 +1,10 @@
 import express from "express";
 
-import { searchServices } from "../search/search.controller.js";
+import { searchServices } from "../searching/search.controller.js";
 
 import { validate } from "../middlewares/validate.middleware.js";
 
-import { serviceSearchSchema } from "../search/search.validation.js";
+import { serviceSearchSchema } from "../searching/search.validation.js";
 
 const router = express.Router();
 
