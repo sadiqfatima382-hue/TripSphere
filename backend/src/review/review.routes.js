@@ -3,7 +3,7 @@ import { createReview, getReviewById, getCustomerReviews, getServiceReviews, get
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizePermission } from "../middlewares/permission.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import { createReviewSchema, updateReviewSchema, reviewQuerySchema, } from "../review/review.validation.js";
+import { createReviewSchema, updateReviewSchema, reviewQuerySchema, moderateReviewSchema} from "../review/review.validation.js";
 
 const router = express.Router();
 
@@ -15,5 +15,5 @@ router.get("/service/:serviceId", validate(reviewQuerySchema, "query"), getServi
 router.get("/", authenticate, authorizePermission("reviews.moderate"), validate(reviewQuerySchema, "query"), getAllReviews);
 router.patch("/:id/moderate", authenticate, authorizePermission("reviews.moderate"), moderateReview);
 router.get("/:id", authenticate, authorizePermission("reviews.create"), getReviewById);
-
+router.patch(  "/:id/moderate",  authenticate,  authorizePermission("reviews.moderate"),  validate(moderateReviewSchema),  moderateReview);
 export default router;

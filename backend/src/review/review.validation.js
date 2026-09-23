@@ -62,3 +62,16 @@ export const reviewQuerySchema = z.object({
     .transform((value) => value === "true")
     .optional(),
 });
+export const moderateReviewSchema = z
+  .object({
+    isApproved: z.boolean().optional(),
+    isVisible: z.boolean().optional(),
+  })
+  .refine(
+    (data) =>
+      data.isApproved !== undefined ||
+      data.isVisible !== undefined,
+    {
+      message: "At least one moderation field is required",
+    }
+  );
