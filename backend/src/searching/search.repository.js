@@ -18,6 +18,8 @@ export const searchServices = async ({
     status: "APPROVED",
     isActive: true,
   };
+
+  // 🔍 Keyword search
   if (search) {
     where.OR = [
       {
@@ -34,10 +36,13 @@ export const searchServices = async ({
       },
     ];
   }
+
+  // 🏷️ Category filter
   if (categoryId) {
     where.categoryId = categoryId;
   }
 
+  // 🌍 Country filter
   if (country) {
     where.country = {
       equals: country,
@@ -45,6 +50,7 @@ export const searchServices = async ({
     };
   }
 
+  // 🏙️ City filter
   if (city) {
     where.city = {
       equals: city,
@@ -52,6 +58,7 @@ export const searchServices = async ({
     };
   }
 
+  // 💰 Price filter
   if (minPrice !== undefined || maxPrice !== undefined) {
     where.basePrice = {};
 
@@ -64,6 +71,7 @@ export const searchServices = async ({
     }
   }
 
+  // ⏱️ Booking hours filter
   if (
     minBookingHours !== undefined ||
     maxBookingHours !== undefined
@@ -79,18 +87,14 @@ export const searchServices = async ({
     }
   }
 
+  // ⭐ Average rating filter
   if (minRating !== undefined) {
-    where.reviews = {
-      some: {
-        isApproved: true,
-        isVisible: true,
-        rating: {
-          gte: minRating,
-        },
-      },
+    where.averageRating = {
+      gte: minRating,
     };
   }
 
+  // ↕️ Sorting
   let orderBy = {
     createdAt: "desc",
   };
@@ -116,9 +120,7 @@ export const searchServices = async ({
 
     case "rating":
       orderBy = {
-        reviews: {
-          _count: "desc",
-        },
+        averageRating: "desc",
       };
       break;
 
@@ -136,7 +138,28 @@ export const searchServices = async ({
       skip,
       take,
 
-      include: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+
+        basePrice: true,
+        currency: true,
+
+        country: true,
+        city: true,
+        address: true,
+
+        minBookingHours: true,
+        maxBookingHours: true,
+
+        status: true,
+        isActive: true,
+
+        averageRating: true,
+        reviewCount: true,
+
         category: {
           select: {
             id: true,
@@ -153,16 +176,6 @@ export const searchServices = async ({
             city: true,
             country: true,
             status: true,
-          },
-        },
-
-        reviews: {
-          where: {
-            isApproved: true,
-            isVisible: true,
-          },
-          select: {
-            rating: true,
           },
         },
       },
