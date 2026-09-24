@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import {  createReview,  findReviewById,  findReviewByBookingId,  findReviewsByCustomer,  findReviewsByService,  findAllReviews,  updateReview,  deleteReview,} from "../review/review.repository.js";
+import { recalculateServiceRating } from "./review-rating.service.js";
 
 export const createReviewService = async (customerId, data) => {
   const { bookingId, rating, comment } = data;
@@ -8,6 +9,7 @@ export const createReviewService = async (customerId, data) => {
     where: {
       id: bookingId,
     },
+
     include: {
       service: {
         include: {
@@ -34,10 +36,14 @@ export const createReviewService = async (customerId, data) => {
   }
 
   if (!booking.service) {
-    throw new Error("Service associated with booking not found");
+    throw new Error(
+      "Service associated with booking not found"
+    );
   }
 
-  const existingReview = await findReviewByBookingId(bookingId);
+  const existingReview = await findReviewByBookingId(
+    bookingId
+  );
 
   if (existingReview) {
     throw new Error(
@@ -45,13 +51,17 @@ export const createReviewService = async (customerId, data) => {
     );
   }
 
-  return createReview({
+  const review = await createReview({
     customerId,
     serviceId: booking.serviceId,
     bookingId,
     rating,
     comment,
   });
+
+  await recalculateServiceRating(booking.serviceId);
+
+  return review;
 };
 
 export const getReviewByIdService = async (
@@ -99,6 +109,7 @@ export const getCustomerReviewsService = async (
 
   return {
     reviews: result.reviews,
+
     pagination: {
       page,
       limit,
@@ -129,6 +140,7 @@ export const getServiceReviewsService = async (
 
   return {
     reviews: result.reviews,
+
     pagination: {
       page,
       limit,
@@ -163,6 +175,7 @@ export const getAllReviewsService = async (query) => {
 
   return {
     reviews: result.reviews,
+
     pagination: {
       page,
       limit,
@@ -202,7 +215,15 @@ export const updateReviewService = async (
   updateData.isApproved = true;
   updateData.isVisible = true;
 
-  return updateReview(reviewId, updateData);
+  const updatedReview = await updateReview(
+    reviewId,
+    updateData
+  );
+
+
+  await recalculateServiceRating(review.serviceId);
+
+  return updatedReview;
 };
 
 export const deleteReviewService = async (
@@ -215,6 +236,7 @@ export const deleteReviewService = async (
   if (!review) {
     throw new Error("Review not found");
   }
+
   if (
     role !== "ADMIN" &&
     role !== "SUPPORT" &&
@@ -225,7 +247,16 @@ export const deleteReviewService = async (
     );
   }
 
-  return deleteReview(reviewId);
+  const serviceId = review.serviceId;
+
+  await deleteReview(reviewId);
+
+
+  await recalculateServiceRating(serviceId);
+
+  return {
+    message: "Review deleted successfully",
+  };
 };
 
 export const moderateReviewService = async (
@@ -248,5 +279,13 @@ export const moderateReviewService = async (
     updateData.isVisible = data.isVisible;
   }
 
-  return updateReview(reviewId, updateData);
+  const updatedReview = await updateReview(
+    reviewId,
+    updateData
+  );
+
+  await recalculateServiceRating(review.serviceId);
+
+  return updatedReview;
 };
+
