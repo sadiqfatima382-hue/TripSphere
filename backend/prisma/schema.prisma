@@ -219,6 +219,8 @@ model Service {
   isActive Boolean   @default(false)
   bookings Booking[]
   reviews  Review[]
+  averageRating Decimal @default(0) @db.Decimal(3, 2)
+  reviewCount   Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
