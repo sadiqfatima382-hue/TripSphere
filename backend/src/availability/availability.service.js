@@ -54,4 +54,4 @@ export async function checkAvailabilityService({
       ? "Service is available for the selected time"
       : "Service is not available for the selected time",
   };
-}
+} 

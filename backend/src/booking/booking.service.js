@@ -1,5 +1,6 @@
 import { createBooking, findAllBookings, findBookingByBookingNumber, findBookingById, findBookingsByCustomer, findBookingsByVendor, updateBooking, deleteBooking } from "./booking.repository.js";
 import prisma from "../config/prisma.js";
+import { checkAvailabilityService } from "../availability/availability.service.js";
 
 function generateBookingNumber() {
   const timestamp = Date.now();
@@ -45,6 +46,23 @@ export async function createBookingService(customerId, data) {
       "End date must be greater than or equal to start date"
     );
   }
+
+   if (!endDate) {
+    throw new Error(
+      "End date is required to check booking availability"
+    );
+  }
+const availability = await checkAvailabilityService({
+  serviceId: data.serviceId,
+  startDate: data.startDate,
+  endDate: data.endDate,
+});
+
+if (!availability.available) {
+  throw new Error(
+    "Service is not available for the selected time"
+  );
+}
 
   const unitPrice = Number(service.basePrice);
   const totalPrice = unitPrice * quantity;
