@@ -165,8 +165,7 @@ export async function getAllBookingsService(query) {
 
   const skip = (page - 1) * limit;
 
-  const { bookings, total } =
-    await findAllBookings({
+  const { bookings, total } = await findAllBookings({
       skip,
       take: limit,
       status,
