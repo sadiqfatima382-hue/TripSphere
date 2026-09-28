@@ -1,6 +1,6 @@
-import { checkAvailabilityService } from "./availability.service";
+import { checkAvailabilityService } from "./availability.service.js";
 
-export async function checkAvailabilityService(req, res, next) {
+export async function checkAvailability(req, res, next) {
     try {
         const { serviceId } = req.params
         const { startDate, endDate } = req.validatedQuery;
