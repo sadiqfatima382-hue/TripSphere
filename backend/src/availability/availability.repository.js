@@ -1,11 +1,10 @@
-
 import prisma from "../config/prisma.js";
 
-export const findOverlappingBookings = async ({
+export async function findOverlappingBookings({
   serviceId,
   startDate,
   endDate,
-}) => {
+}) {
   return prisma.booking.findMany({
     where: {
       serviceId,
@@ -43,4 +42,4 @@ export const findOverlappingBookings = async ({
       status: true,
     },
   });
-};
+}
