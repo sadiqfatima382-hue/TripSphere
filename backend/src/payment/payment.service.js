@@ -1,6 +1,6 @@
 import {  createPayment,  findPaymentById,  findPaymentByBookingId,  findPaymentByProviderPaymentId,  findPaymentsByCustomer,  findAllPayments,  updatePayment,  deletePayment,} from "../payment/payment.repository.js";
 import prisma from "../config/prisma.js";
-import { paymentSuccessfulTemplate, paymentFailedTemplate } from "../templates/email.template.js";
+import { paymentSuccessfulTemplate, paymentFailedTemplate, bookingCancelledTemplate } from "../templates/email.template.js";
 import { sendEmail } from "../email/email.service.js";
 
 export async function createPaymentService(
@@ -336,6 +336,77 @@ export async function markPaymentAsFailedService(
   });
 
   return updatedPayment;
+}
+
+export async function cancelBookingService(
+  bookingId,
+  userId
+) {
+  const booking = await findBookingById(bookingId);
+
+  if (!booking) {
+    throw new Error("Booking not found");
+  }
+
+  // Keep your existing authorization checks here
+
+  if (booking.status === "CANCELLED") {
+    throw new Error("Booking is already cancelled");
+  }
+
+  if (booking.status === "COMPLETED") {
+    throw new Error(
+      "Completed booking cannot be cancelled"
+    );
+  }
+
+  const cancellationReason =
+    "Booking cancelled by customer";
+
+  const updatedBooking = await updateBooking(
+    bookingId,
+    {
+      status: "CANCELLED",
+    }
+  );
+
+  const customer = await prisma.user.findUnique({
+    where: {
+      id: booking.customerId,
+    },
+
+    select: {
+      firstName: true,
+      lastName: true,
+      email: true,
+    },
+  });
+
+  if (!customer) {
+    throw new Error("Customer not found");
+  }
+
+  const email = bookingCancelledTemplate({
+    customerName: `${customer.firstName} ${customer.lastName}`,
+
+    bookingNumber: updatedBooking.bookingNumber,
+
+    serviceName: booking.service.name,
+
+    cancellationReason,
+  });
+
+  await sendEmail({
+    to: customer.email,
+
+    subject: email.subject,
+
+    text: email.text,
+
+    html: email.html,
+  });
+
+  return updatedBooking;
 }
 
 export async function deletePaymentService(paymentId) {
