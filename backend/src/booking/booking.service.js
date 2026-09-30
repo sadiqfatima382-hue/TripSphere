@@ -1,6 +1,8 @@
 import { createBooking, findAllBookings, findBookingByBookingNumber, findBookingById, findBookingsByCustomer, findBookingsByVendor, updateBooking, deleteBooking } from "./booking.repository.js";
 import prisma from "../config/prisma.js";
 import { checkAvailabilityService } from "../availability/availability.service.js";
+import {bookingCreatedTemplate, bookingConfirmedTemplate , bookingCancelledTemplate, paymentFailedTemplate, paymentSuccessfulTemplate} from "../templates/email.template.js"
+import {sendEmail} from "../email/email.service.js"
 
 function generateBookingNumber() {
   const timestamp = Date.now();
@@ -64,27 +66,56 @@ if (!availability.available) {
   );
 }
 
+const customer = await prisma.user.findUnique({
+  where: {id: customerId},
+  select: {
+    firstName: true,
+    lastName:true ,
+    email: true,
+  }
+});
+if (!customer){
+  throw new Error("Customer not found")
+}
+
   const unitPrice = Number(service.basePrice);
   const totalPrice = unitPrice * quantity;
 
   const bookingNumber = generateBookingNumber();
 
   const booking = await createBooking({
-    bookingNumber,
-    customerId,
-    serviceId,
-    vendorId: service.vendorId,
-    startDate,
-    endDate,
-    quantity,
-    unitPrice,
-    totalPrice,
-    currency: service.currency,
-    status: "PENDING",
-    customerNote,
-  });
+  bookingNumber,
+  customerId,
+  serviceId,
+  vendorId: service.vendorId,
+  startDate,
+  endDate,
+  quantity,
+  unitPrice,
+  totalPrice,
+  currency: service.currency,
+  status: "PENDING",
+  customerNote,
+});
 
-  return booking;
+const email = bookingCreatedTemplate({
+  customerName: `${customer.firstName} ${customer.lastName}`,
+  bookingNumber: booking.bookingNumber,
+  serviceName: service.name,
+  startDate: booking.startDate,
+  endDate: booking.endDate,
+  totalPrice: booking.totalPrice,
+  currency: booking.currency,
+});
+
+await sendEmail({
+  to: customer.email,
+  subject: email.subject,
+  text: email.text,
+  html: email.html,
+});
+
+return booking;
 }
 
 export async function getBookingByIdService(id) {
@@ -225,9 +256,44 @@ export async function confirmBookingService(
     );
   }
 
-  return updateBooking(bookingId, {
+  const updatedBooking = await updateBooking(bookingId, {
     status: "CONFIRMED",
   });
+
+  const customer = await prisma.user.findUnique({
+    where: {
+      id: booking.customerId,
+    },
+
+    select: {
+      firstName: true,
+      lastName: true,
+      email: true,
+    },
+  });
+
+  if (!customer) {
+    throw new Error("Customer not found");
+  }
+
+  const email = bookingConfirmedTemplate({
+    customerName: `${customer.firstName} ${customer.lastName}`,
+    bookingNumber: updatedBooking.bookingNumber,
+    serviceName: booking.service.name,
+    startDate: updatedBooking.startDate,
+    endDate: updatedBooking.endDate,
+    totalPrice: updatedBooking.totalPrice,
+    currency: updatedBooking.currency,
+  });
+
+  await sendEmail({
+    to: customer.email,
+    subject: email.subject,
+    text: email.text,
+    html: email.html,
+  });
+
+  return updatedBooking;
 }
 
 export async function cancelBookingService(

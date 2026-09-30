@@ -1,5 +1,6 @@
 import {  createPayment,  findPaymentById,  findPaymentByBookingId,  findPaymentByProviderPaymentId,  findPaymentsByCustomer,  findAllPayments,  updatePayment,  deletePayment,} from "../payment/payment.repository.js";
 import prisma from "../config/prisma.js";
+import { paymentSuccessfulTemplate } from "../templates/email.template.js";
 
 export async function createPaymentService(
   customerId,
@@ -211,13 +212,57 @@ export async function markPaymentAsPaidService(
     }
   );
 
+  const booking = await prisma.booking.findUnique({
+    where: {
+      id: payment.bookingId,
+    },
+
+    include: {
+      service: true,
+      customer: {
+        select: {
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  if (!booking) {
+    throw new Error("Booking not found");
+  }
+
   await prisma.booking.update({
     where: {
       id: payment.bookingId,
     },
+
     data: {
       status: "CONFIRMED",
     },
+  });
+
+  const email = paymentSuccessfulTemplate({
+    customerName: `${booking.customer.firstName} ${booking.customer.lastName}`,
+
+    bookingNumber: booking.bookingNumber,
+
+    paymentId: updatedPayment.id,
+
+    amount: updatedPayment.amount,
+
+    currency: updatedPayment.currency,
+  });
+
+  await sendEmail({
+    to: booking.customer.email,
+
+    subject: email.subject,
+
+    text: email.text,
+
+    html: email.html,
   });
 
   return updatedPayment;
