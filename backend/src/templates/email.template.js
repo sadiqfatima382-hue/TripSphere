@@ -149,3 +149,60 @@ Thank you for choosing TripSphere.
     `,
   };
 }
+
+export function bookingCancelledTemplate({
+  customerName,
+  bookingNumber,
+  serviceName,
+  cancellationReason,
+}) {
+  return {
+    subject: `TripSphere Booking Cancelled - ${bookingNumber}`,
+
+    text: `
+Hello ${customerName},
+
+Your TripSphere booking has been cancelled.
+
+Booking Number: ${bookingNumber}
+Service: ${serviceName}
+
+Cancellation Reason:
+${cancellationReason || "No reason provided"}
+
+If you believe this cancellation was made in error, please contact TripSphere support.
+
+Thank you.
+`,
+
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>TripSphere Booking Cancelled</h2>
+
+        <p>Hello ${customerName},</p>
+
+        <p>
+          Your booking has been <strong>cancelled</strong>.
+        </p>
+
+        <p>
+          <strong>Booking Number:</strong> ${bookingNumber}
+        </p>
+
+        <p>
+          <strong>Service:</strong> ${serviceName}
+        </p>
+
+        <p>
+          <strong>Cancellation Reason:</strong><br>
+          ${cancellationReason || "No reason provided"}
+        </p>
+
+        <p>
+          If you believe this cancellation was made in error,
+          please contact TripSphere support.
+        </p>
+      </div>
+    `,
+  };
+}
