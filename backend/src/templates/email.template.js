@@ -206,3 +206,65 @@ Thank you.
     `,
   };
 }
+
+export function paymentSuccessfulTemplate({
+  customerName,
+  bookingNumber,
+  paymentId,
+  amount,
+  currency,
+}) {
+  return {
+    subject: `TripSphere Payment Successful - ${bookingNumber}`,
+
+    text: `
+Hello ${customerName},
+
+Your TripSphere payment was successful.
+
+Booking Number: ${bookingNumber}
+Payment ID: ${paymentId}
+Amount: ${currency} ${amount}
+
+Your booking has been confirmed.
+
+Thank you for choosing TripSphere.
+`,
+
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>TripSphere Payment Successful</h2>
+
+        <p>Hello ${customerName},</p>
+
+        <p>
+          Your payment was successfully processed.
+        </p>
+
+        <table cellpadding="8" cellspacing="0" border="1">
+          <tr>
+            <td><strong>Booking Number</strong></td>
+            <td>${bookingNumber}</td>
+          </tr>
+
+          <tr>
+            <td><strong>Payment ID</strong></td>
+            <td>${paymentId}</td>
+          </tr>
+
+          <tr>
+            <td><strong>Amount</strong></td>
+            <td>${currency} ${amount}</td>
+          </tr>
+        </table>
+
+        <p>
+          Your booking has been confirmed.
+        </p>
+
+        <p>Thank you for choosing TripSphere.</p>
+      </div>
+    `,
+  };
+}
+
