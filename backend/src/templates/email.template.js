@@ -268,3 +268,59 @@ Thank you for choosing TripSphere.
   };
 }
 
+export function paymentFailedTemplate({
+  customerName,
+  bookingNumber,
+  amount,
+  currency,
+  reason,
+}) {
+  return {
+    subject: `TripSphere Payment Failed - ${bookingNumber}`,
+
+    text: `
+Hello ${customerName},
+
+Unfortunately, your TripSphere payment could not be completed.
+
+Booking Number: ${bookingNumber}
+Amount: ${currency} ${amount}
+
+Reason:
+${reason || "Payment processing failed"}
+
+Please try again or use another payment method.
+
+Thank you.
+`,
+
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>TripSphere Payment Failed</h2>
+
+        <p>Hello ${customerName},</p>
+
+        <p>
+          Unfortunately, your payment could not be completed.
+        </p>
+
+        <p>
+          <strong>Booking Number:</strong> ${bookingNumber}
+        </p>
+
+        <p>
+          <strong>Amount:</strong> ${currency} ${amount}
+        </p>
+
+        <p>
+          <strong>Reason:</strong><br>
+          ${reason || "Payment processing failed"}
+        </p>
+
+        <p>
+          Please try again or use another payment method.
+        </p>
+      </div>
+    `,
+  };
+}
