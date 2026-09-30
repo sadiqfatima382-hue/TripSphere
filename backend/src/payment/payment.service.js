@@ -1,6 +1,6 @@
 import {  createPayment,  findPaymentById,  findPaymentByBookingId,  findPaymentByProviderPaymentId,  findPaymentsByCustomer,  findAllPayments,  updatePayment,  deletePayment,} from "../payment/payment.repository.js";
 import prisma from "../config/prisma.js";
-import { paymentSuccessfulTemplate } from "../templates/email.template.js";
+import { paymentSuccessfulTemplate, paymentFailedTemplate } from "../templates/email.template.js";
 import { sendEmail } from "../email/email.service.js";
 
 export async function createPaymentService(
@@ -285,10 +285,57 @@ export async function markPaymentAsFailedService(
     );
   }
 
-  return updatePayment(paymentId, {
-    status: "FAILED",
-    failureReason,
+  const updatedPayment = await updatePayment(
+    paymentId,
+    {
+      status: "FAILED",
+      failureReason,
+    }
+  );
+
+  const booking = await prisma.booking.findUnique({
+    where: {
+      id: payment.bookingId,
+    },
+
+    include: {
+      customer: {
+        select: {
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+    },
   });
+
+  if (!booking) {
+    throw new Error("Booking not found");
+  }
+
+  const email = paymentFailedTemplate({
+    customerName: `${booking.customer.firstName} ${booking.customer.lastName}`,
+
+    bookingNumber: booking.bookingNumber,
+
+    amount: updatedPayment.amount,
+
+    currency: updatedPayment.currency,
+
+    reason: failureReason,
+  });
+
+  await sendEmail({
+    to: booking.customer.email,
+
+    subject: email.subject,
+
+    text: email.text,
+
+    html: email.html,
+  });
+
+  return updatedPayment;
 }
 
 export async function deletePaymentService(paymentId) {
