@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { sendEmail } from "../services/email.service.js";
+import { sendEmail } from "../email/email.service.js";
 
 async function testSendEmail() {
   try {
