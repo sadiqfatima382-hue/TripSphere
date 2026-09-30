@@ -1,6 +1,7 @@
 import {  createPayment,  findPaymentById,  findPaymentByBookingId,  findPaymentByProviderPaymentId,  findPaymentsByCustomer,  findAllPayments,  updatePayment,  deletePayment,} from "../payment/payment.repository.js";
 import prisma from "../config/prisma.js";
 import { paymentSuccessfulTemplate } from "../templates/email.template.js";
+import { sendEmail } from "../email/email.service.js";
 
 export async function createPaymentService(
   customerId,
