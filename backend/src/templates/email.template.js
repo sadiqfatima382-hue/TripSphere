@@ -324,3 +324,124 @@ Thank you.
     `,
   };
 }
+
+export function vendorNewBookingTemplate({
+  vendorName,
+  bookingNumber,
+  customerName,
+  serviceName,
+  startDate,
+  endDate,
+  quantity,
+  totalPrice,
+  currency,
+}) {
+  return {
+    subject: `New Booking Received - ${bookingNumber}`,
+
+    text: `
+Hello ${vendorName},
+
+You have received a new booking on TripSphere.
+
+Booking Number: ${bookingNumber}
+Customer: ${customerName}
+Service: ${serviceName}
+Start Date: ${startDate}
+End Date: ${endDate}
+Quantity: ${quantity}
+Total Price: ${totalPrice} ${currency}
+
+Please log in to TripSphere to review and manage this booking.
+
+Thank you,
+TripSphere
+`,
+
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>New Booking Received</h2>
+
+        <p>Hello ${vendorName},</p>
+
+        <p>
+          You have received a new booking on TripSphere.
+        </p>
+
+        <table style="border-collapse: collapse; width: 100%; max-width: 600px;">
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">
+              Booking Number
+            </td>
+            <td style="padding: 8px;">
+              ${bookingNumber}
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">
+              Customer
+            </td>
+            <td style="padding: 8px;">
+              ${customerName}
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">
+              Service
+            </td>
+            <td style="padding: 8px;">
+              ${serviceName}
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">
+              Start Date
+            </td>
+            <td style="padding: 8px;">
+              ${startDate}
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">
+              End Date
+            </td>
+            <td style="padding: 8px;">
+              ${endDate}
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">
+              Quantity
+            </td>
+            <td style="padding: 8px;">
+              ${quantity}
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">
+              Total Price
+            </td>
+            <td style="padding: 8px;">
+              ${totalPrice} ${currency}
+            </td>
+          </tr>
+        </table>
+
+        <p>
+          Please log in to TripSphere to review and manage this booking.
+        </p>
+
+        <p>
+          Thank you,<br />
+          TripSphere
+        </p>
+      </div>
+    `,
+  };
+}
