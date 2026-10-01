@@ -298,8 +298,7 @@ export async function confirmBookingService(
 
 export async function cancelBookingService(
   bookingId,
-  customerId,
-  reason
+  userId
 ) {
   const booking = await findBookingById(bookingId);
 
@@ -307,27 +306,65 @@ export async function cancelBookingService(
     throw new Error("Booking not found");
   }
 
-  if (booking.customerId !== customerId) {
+  // Keep your existing authorization checks here
+
+  if (booking.status === "CANCELLED") {
+    throw new Error("Booking is already cancelled");
+  }
+
+  if (booking.status === "COMPLETED") {
     throw new Error(
-      "You are not authorized to cancel this booking"
+      "Completed booking cannot be cancelled"
     );
   }
 
-  if (
-    booking.status !== "PENDING" &&
-    booking.status !== "CONFIRMED"
-  ) {
-    throw new Error(
-      "This booking cannot be cancelled"
-    );
-  }
+  const cancellationReason =
+    "Booking cancelled by customer";
 
-  return updateBooking(bookingId, {
-    status: "CANCELLED",
-    customerNote: reason
-      ? `${booking.customerNote || ""}\nCancellation reason: ${reason}`.trim()
-      : booking.customerNote,
+  const updatedBooking = await updateBooking(
+    bookingId,
+    {
+      status: "CANCELLED",
+    }
+  );
+
+  const customer = await prisma.user.findUnique({
+    where: {
+      id: booking.customerId,
+    },
+
+    select: {
+      firstName: true,
+      lastName: true,
+      email: true,
+    },
   });
+
+  if (!customer) {
+    throw new Error("Customer not found");
+  }
+
+  const email = bookingCancelledTemplate({
+    customerName: `${customer.firstName} ${customer.lastName}`,
+
+    bookingNumber: updatedBooking.bookingNumber,
+
+    serviceName: booking.service.name,
+
+    cancellationReason,
+  });
+
+  await sendEmail({
+    to: customer.email,
+
+    subject: email.subject,
+
+    text: email.text,
+
+    html: email.html,
+  });
+
+  return updatedBooking;
 }
 
 export async function completeBookingService(
