@@ -2,7 +2,7 @@ import { createBooking, findAllBookings, findBookingByBookingNumber, findBooking
 import prisma from "../config/prisma.js";
 import { checkAvailabilityService } from "../availability/availability.service.js";
 import {bookingCreatedTemplate, bookingConfirmedTemplate , bookingCancelledTemplate, vendorNewBookingTemplate} from "../templates/email.template.js"
-import {sendEmail} from "../email/email.service.js"
+import {sendNotificationEmail} from "../email/notification.service.js"
 
 function generateBookingNumber() {
   const timestamp = Date.now();
@@ -108,7 +108,7 @@ const email = bookingCreatedTemplate({
   currency: booking.currency,
 });
 
-await sendEmail({
+await sendNotificationEmail({
   to: customer.email,
   subject: email.subject,
   text: email.text,
@@ -138,7 +138,7 @@ console.log("Vendor notification:", {
   vendorName: service.vendor.businessName,
   vendorEmail: service.vendor.email,
 });
-await sendEmail({
+await sendNotificationEmail({
   to: service.vendor.email,
 
   subject: vendorEmail.subject,
@@ -319,7 +319,7 @@ export async function confirmBookingService(
     currency: updatedBooking.currency,
   });
 
-  await sendEmail({
+  await sendNotificationEmail({
     to: customer.email,
     subject: email.subject,
     text: email.text,
@@ -387,7 +387,7 @@ export async function cancelBookingService(
     cancellationReason,
   });
 
-  await sendEmail({
+  await sendNotificationEmail({
     to: customer.email,
 
     subject: email.subject,

@@ -1,7 +1,7 @@
 import {  createPayment,  findPaymentById,  findPaymentByBookingId,  findPaymentByProviderPaymentId,  findPaymentsByCustomer,  findAllPayments,  updatePayment,  deletePayment,} from "../payment/payment.repository.js";
 import prisma from "../config/prisma.js";
 import { paymentSuccessfulTemplate, paymentFailedTemplate,} from "../templates/email.template.js";
-import { sendEmail } from "../email/email.service.js";
+import { sendNotificationEmail } from "../email/notification.service.js";
 
 export async function createPaymentService(
   customerId,
@@ -256,7 +256,7 @@ export async function markPaymentAsPaidService(
     currency: updatedPayment.currency,
   });
 
-  await sendEmail({
+  await sendNotificationEmail({
     to: booking.customer.email,
 
     subject: email.subject,
@@ -325,7 +325,7 @@ export async function markPaymentAsFailedService(
     reason: failureReason,
   });
 
-  await sendEmail({
+  await sendNotificationEmail({
     to: booking.customer.email,
 
     subject: email.subject,
