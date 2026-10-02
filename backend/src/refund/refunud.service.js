@@ -93,16 +93,17 @@ export async function getRefundByIdService(refundId) {
 
 export async function getPaymentRefundsService(paymentId) {
   const payment = await prisma.payment.findUnique({
-    where: {
-      id: paymentId,
-    },
+    where: { id: paymentId },
   });
 
   if (!payment) {
     throw new Error("Payment not found");
   }
 
-  return findRefundsByPayment(paymentId);
+  return {
+    customerId: payment.customerId,
+    refunds: await findRefundsByPayment(paymentId),
+  };
 }
 
 export async function getAllRefundsService(query) {
