@@ -52,14 +52,19 @@ export async function getRefundByIdController(req, res, next) {
 
 export async function getPaymentRefundsController(req, res, next) {
   try {
-    const payment = await getPaymentRefundsService(
-      req.params.paymentId
-    );
+    const result = await getPaymentRefundsService(req.params.paymentId);
 
     if (
       req.user.role === "CUSTOMER" &&
-      payment.some((refund) => refund.payment.customerId !== req.user.id)
+      result.customerId !== req.user.id
     ) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to view these refunds",
+      });
+    }
+
+    if (req.user.role === "VENDOR") {
       return res.status(403).json({
         success: false,
         message: "You are not authorized to view these refunds",
@@ -68,13 +73,10 @@ export async function getPaymentRefundsController(req, res, next) {
 
     return res.status(200).json({
       success: true,
-      data: payment,
+      data: result.refunds,
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-  })
+    next(error);
   }
 }
 
