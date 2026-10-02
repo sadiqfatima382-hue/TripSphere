@@ -42,6 +42,14 @@ enum PaymentStatus {
   CANCELLED
 }
 
+enum RefundStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
 model User {
   id String @id @default(uuid())
 
@@ -303,6 +311,8 @@ model Payment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  refunds Refund[]
+
   @@index([customerId])
   @@index([status])
   @@index([method])
@@ -338,3 +348,32 @@ model Review {
   @@index([isApproved])
   @@map("reviews")
 }
+
+model Refund {
+  id String @id @default(uuid())
+
+  paymentId String
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  amount   Decimal @db.Decimal(12, 2)
+  currency String  @default("USD")
+
+  reason String?
+
+  status RefundStatus @default(PENDING)
+
+  providerRefundId String? @unique
+
+  processedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([paymentId])
+  @@index([status])
+  @@index([createdAt])
+
+  @@map("refunds")
+}
+
+
