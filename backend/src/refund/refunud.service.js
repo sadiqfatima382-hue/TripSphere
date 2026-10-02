@@ -1,0 +1,138 @@
+import prisma from "../config/prisma.js";
+import {  createRefund, findRefundById,  findRefundsByPayment,  findAllRefunds,  updateRefund,} from "../refund/refund.repository.js";
+
+export async function createRefundService(customerId, data) {
+  const { paymentId, amount, reason } = data;
+
+  const payment = await prisma.payment.findUnique({
+    where: {
+      id: paymentId,
+    },
+    include: {
+      booking: true,
+    },
+  });
+
+  if (!payment) {
+    throw new Error("Payment not found");
+  }
+
+  if (payment.customerId !== customerId) {
+    throw new Error(
+      "You are not authorized to request a refund for this payment"
+    );
+  }
+
+  if (payment.status !== "PAID") {
+    throw new Error(
+      "Only paid payments can be refunded"
+    );
+  }
+
+  if (payment.method !== "STRIPE") {
+    throw new Error(
+      "Only Stripe payments can be refunded automatically"
+    );
+  }
+
+  if (!payment.booking) {
+    throw new Error("Booking not found");
+  }
+
+  if (payment.booking.status !== "CANCELLED") {
+    throw new Error(
+      "Booking must be cancelled before requesting a refund"
+    );
+  }
+
+  const previousRefunds = await findRefundsByPayment(paymentId);
+
+  const refundedAmount = previousRefunds
+    .filter((refund) => refund.status === "SUCCEEDED")
+    .reduce((total, refund) => total + Number(refund.amount), 0);
+
+  const paymentAmount = Number(payment.amount);
+  const remainingAmount = paymentAmount - refundedAmount;
+
+  if (amount > remainingAmount) {
+    throw new Error(
+      `Refund amount cannot exceed the remaining refundable amount of ${remainingAmount}`
+    );
+  }
+
+  const activeRefund = previousRefunds.find(
+    (refund) =>
+      refund.status === "PENDING" ||
+      refund.status === "PROCESSING"
+  );
+
+  if (activeRefund) {
+    throw new Error(
+      "A refund is already being processed for this payment"
+    );
+  }
+
+  return createRefund({
+    paymentId,
+    amount,
+    currency: payment.currency,
+    reason,
+    status: "PENDING",
+  });
+}
+
+export async function getRefundByIdService(refundId) {
+  const refund = await findRefundById(refundId);
+
+  if (!refund) {
+    throw new Error("Refund not found");
+  }
+
+  return refund;
+}
+
+export async function getPaymentRefundsService(paymentId) {
+  const payment = await prisma.payment.findUnique({
+    where: {
+      id: paymentId,
+    },
+  });
+
+  if (!payment) {
+    throw new Error("Payment not found");
+  }
+
+  return findRefundsByPayment(paymentId);
+}
+
+export async function getAllRefundsService(query) {
+  const { page, limit, status } = query;
+
+  const skip = (page - 1) * limit;
+
+  const { refunds, total } = await findAllRefunds({
+    skip,
+    take: limit,
+    status,
+  });
+
+  return {
+    refunds,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
+
+export async function updateRefundService(refundId, data) {
+  const refund = await findRefundById(refundId);
+
+  if (!refund) {
+    throw new Error("Refund not found");
+  }
+
+  return updateRefund(refundId, data);
+}
