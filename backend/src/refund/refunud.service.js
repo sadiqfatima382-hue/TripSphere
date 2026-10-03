@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import {  createRefund, findRefundById,  findRefundsByPayment,  findAllRefunds,  updateRefund,} from "../refund/refund.repository.js";
+import { createStripeRefund } from "../payment/stripe.service.js";
 
 export async function createRefundService(customerId, data) {
   const { paymentId, amount, reason } = data;
@@ -138,4 +139,108 @@ export async function updateRefundService(refundId, data) {
   }
 
   return updateRefund(refundId, data);
+}
+
+export async function processStripeRefundService(
+  refundId,
+  customerId
+) {
+  const refund = await findRefundById(refundId);
+
+  if (!refund) {
+    throw new Error("Refund not found");
+  }
+
+  if (refund.payment.customerId !== customerId) {
+    throw new Error(
+      "You are not authorized to process this refund"
+    );
+  }
+
+  if (refund.status !== "PENDING") {
+    throw new Error(
+      "Only pending refunds can be processed"
+    );
+  }
+
+  const payment = refund.payment;
+
+  if (payment.status !== "PAID") {
+    throw new Error(
+      "Only paid payments can be refunded"
+    );
+  }
+
+  if (payment.method !== "STRIPE") {
+    throw new Error(
+      "Only Stripe payments can be refunded"
+    );
+  }
+
+  if (!payment.providerPaymentId) {
+    throw new Error(
+      "Stripe payment ID is missing"
+    );
+  }
+
+  await updateRefund(refundId, {
+    status: "PROCESSING",
+  });
+
+  try {
+    const stripeRefund = await createStripeRefund({
+      paymentIntentId: payment.providerPaymentId,
+      amount: refund.amount,
+    });
+
+    const updatedRefund = await updateRefund(refundId, {
+      status:
+        stripeRefund.status === "succeeded"
+          ? "SUCCEEDED"
+          : "PROCESSING",
+
+      providerRefundId: stripeRefund.id,
+
+      processedAt:
+        stripeRefund.status === "succeeded"
+          ? new Date()
+          : null,
+    });
+
+    if (stripeRefund.status === "succeeded") {
+      const paymentRefunds = await findRefundsByPayment(
+        payment.id
+      );
+
+      const successfulRefundAmount = paymentRefunds
+        .filter((item) => item.status === "SUCCEEDED")
+        .reduce(
+          (total, item) => total + Number(item.amount),
+          0
+        );
+
+      if (
+        successfulRefundAmount >= Number(payment.amount)
+      ) {
+        await prisma.payment.update({
+          where: {
+            id: payment.id,
+          },
+          data: {
+            status: "REFUNDED",
+          },
+        });
+      }
+    }
+
+    return updatedRefund;
+  } catch (error) {
+    await updateRefund(refundId, {
+      status: "FAILED",
+    });
+
+    throw new Error(
+      `Stripe refund failed: ${error.message}`
+    );
+  }
 }
