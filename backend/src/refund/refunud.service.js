@@ -106,8 +106,10 @@ export async function getPaymentRefundsService(paymentId) {
   };
 }
 
-export async function getAllRefundsService(query) {
-  const { page, limit, status } = query;
+export async function getAllRefundsService(query = {}) {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const { status } = query;
 
   const skip = (page - 1) * limit;
 
