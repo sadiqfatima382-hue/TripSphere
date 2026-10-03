@@ -1,4 +1,4 @@
-import { createRefundService, getRefundByIdService, getPaymentRefundsService, getAllRefundsService, } from "./refunud.service.js";
+import { createRefundService, getRefundByIdService, getPaymentRefundsService, getAllRefundsService, processStripeRefundService} from "./refunud.service.js";
 
 export async function createRefundController(req, res, next) {
     try {
@@ -75,7 +75,10 @@ export async function getPaymentRefundsController(req, res, next) {
       data: result.refunds,
     });
   } catch (error) {
-    next(error);
+     return res.status(500).json({
+      success: false,
+      message: error.message,
+  })
   }
 }
 
@@ -93,4 +96,24 @@ export async function getAllRefundsController(req, res, next) {
       message: error.message,
   })
 }
+}
+
+export async function processStripeRefundController(req, res, next) {
+  try {
+    const refund = await processStripeRefundService(
+      req.params.id,
+      req.user.id
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Refund processed successfully",
+      data: refund,
+    });
+  } catch (error) {
+     return res.status(500).json({
+      success: false,
+      message: error.message,
+  })
+  }
 }
