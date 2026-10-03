@@ -11,6 +11,8 @@ router.use(authenticate);
 
 router.post(  "/",  authorizeRoles("CUSTOMER"),  validate(createRefundSchema),  createRefundController);
 
+router.post(  "/:id/process",  authorizeRoles("CUSTOMER"),  processStripeRefundController);
+
 router.get(  "/",  authorizeRoles("ADMIN", "SUPPORT"), getAllRefundsController);
 
 router.get(  "/payments/:paymentId",  getPaymentRefundsController);
