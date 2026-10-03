@@ -100,3 +100,13 @@ export const createStripeCheckoutSessionService = async (
     checkoutUrl: session.url,
   };
 }
+
+export async function createStripeRefund({
+  paymentIntentId,
+  amount,
+}) {
+  return stripe.refunds.create({
+    payment_intent: paymentIntentId,
+    amount: Math.round(Number(amount) * 100),
+  });
+}
