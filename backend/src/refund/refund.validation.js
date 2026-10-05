@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const createRefundSchema = z.object({
-    pymentId: z.string().uuid("Invalid payment ID"),
+    paymentId: z.string().uuid("Invalid payment ID"),
 
     amount: z.coerce
         .number()

@@ -1,5 +1,5 @@
 import express from "express";
-import {  createRefundController,  getRefundByIdController,  getPaymentRefundsController,  getAllRefundsController,} from "../refund/refund.controller.js";
+import { createRefundController, getRefundByIdController, getPaymentRefundsController, getAllRefundsController, processStripeRefundController} from "../refund/refund.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
@@ -9,14 +9,14 @@ const router = express.Router();
 
 router.use(authenticate);
 
-router.post(  "/",  authorizeRoles("CUSTOMER"),  validate(createRefundSchema),  createRefundController);
+router.post("/", authorizeRoles("CUSTOMER"), validate(createRefundSchema), createRefundController);
 
-router.post(  "/:id/process",  authorizeRoles("CUSTOMER"),  processStripeRefundController);
+router.post("/:id/process", authorizeRoles("CUSTOMER"), processStripeRefundController);
 
-router.get(  "/",  authorizeRoles("ADMIN", "SUPPORT"), getAllRefundsController);
+router.get("/", authorizeRoles("ADMIN", "SUPPORT"), getAllRefundsController);
 
-router.get(  "/payments/:paymentId",  getPaymentRefundsController);
+router.get("/payments/:paymentId", getPaymentRefundsController);
 
-router.get(  "/:id",  getRefundByIdController);
+router.get("/:id", getRefundByIdController);
 
 export default router;

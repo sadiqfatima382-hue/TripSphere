@@ -3,13 +3,13 @@ import { createRefundService, getRefundByIdService, getPaymentRefundsService, ge
 export async function createRefundController(req, res, next) {
     try {
         const refund = await createRefundService(req.user.id, req.body)
-        return req.status(201).json({
+        return res.status(201).json({
             success: true,
             message:("Refund Request Created Successfully"),
             data: refund,
         })
     } catch (error) {
-         return req.status(500).json({
+         return res.status(500).json({
             success: false,
             message: error.message,
     })
