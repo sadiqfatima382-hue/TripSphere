@@ -1,6 +1,6 @@
-import {  createPayment,  findPaymentById,  findPaymentByBookingId,  findPaymentByProviderPaymentId,  findPaymentsByCustomer,  findAllPayments,  updatePayment,  deletePayment,} from "../payment/payment.repository.js";
+import { createPayment, findPaymentById, findPaymentByBookingId, findPaymentByProviderPaymentId, findPaymentsByCustomer, findAllPayments, updatePayment, deletePayment, } from "../payment/payment.repository.js";
 import prisma from "../config/prisma.js";
-import { paymentSuccessfulTemplate, paymentFailedTemplate,} from "../templates/email.template.js";
+import { paymentSuccessfulTemplate, paymentFailedTemplate, } from "../templates/email.template.js";
 import { sendNotificationEmail } from "../email/notification.service.js";
 
 export async function createPaymentService(
@@ -217,7 +217,11 @@ export async function markPaymentAsPaidService(
 
     return payment;
   }
-
+  console.log("💾 Saving Stripe payment data:", {
+    paymentId,
+    transactionId,
+    providerPaymentId,
+  });
   const updatedPayment = await updatePayment(
     paymentId,
     {

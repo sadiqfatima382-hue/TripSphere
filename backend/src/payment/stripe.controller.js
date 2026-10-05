@@ -1,6 +1,6 @@
 import stripe from "../config/stripe.js";
 
-import {  markPaymentAsPaidService,  markPaymentAsFailedService,} from "./payment.service.js";
+import { markPaymentAsPaidService, markPaymentAsFailedService, } from "./payment.service.js";
 
 export const stripeWebhook = async (req, res, next) => {
   console.log("🔥 Stripe webhook received");
@@ -52,6 +52,13 @@ export const stripeWebhook = async (req, res, next) => {
         }
 
         const paymentIntentId = session.payment_intent;
+
+        console.log("🔎 Stripe payment debug:", {
+          sessionId: session.id,
+          paymentIntentId,
+          paymentId,
+          paymentIntentType: typeof paymentIntentId,
+        });
 
         await markPaymentAsPaidService(
           paymentId,
