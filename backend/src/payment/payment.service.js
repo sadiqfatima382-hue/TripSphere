@@ -193,14 +193,29 @@ export async function markPaymentAsPaidService(
     throw new Error("Payment not found");
   }
 
-  if (payment.status === "PAID") {
-    return payment;
-  }
-
   if (payment.status === "REFUNDED") {
     throw new Error(
       "Refunded payment cannot be marked as paid"
     );
+  }
+
+  if (payment.status === "PAID") {
+    if (
+      !payment.providerPaymentId ||
+      !payment.transactionId
+    ) {
+      return updatePayment(paymentId, {
+        transactionId:
+          payment.transactionId || transactionId,
+
+        providerPaymentId:
+          payment.providerPaymentId || providerPaymentId,
+
+        paidAt: payment.paidAt || new Date(),
+      });
+    }
+
+    return payment;
   }
 
   const updatedPayment = await updatePayment(
