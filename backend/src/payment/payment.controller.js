@@ -118,7 +118,10 @@ export const createCheckoutSession = async (req, res, next) => {
       data: session,
     });
   } catch (error) {
-    next(error);
+     return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
   }
 };
 export const paymentSuccess = async (req, res) => {
