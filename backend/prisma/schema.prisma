@@ -64,6 +64,13 @@ enum PayoutStatus {
   CANCELLED
 }
 
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  CANCELLED
+}
+
 model User {
   id String @id @default(uuid())
 
@@ -85,6 +92,7 @@ model User {
   bookings      Booking[]
   payments      Payment[]
   reviews       Review[]
+  invoices      Invoice[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -288,6 +296,7 @@ model Booking {
   customerNote String?
 
   payout Payout?
+  invoice Invoice?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -329,6 +338,7 @@ model Payment {
   updatedAt DateTime @updatedAt
 
   refunds Refund[]
+  invoice Invoice?
 
   @@index([customerId])
   @@index([status])
@@ -426,4 +436,40 @@ model Payout {
   @@index([createdAt])
 
   @@map("payouts")
+}
+
+model Invoice {
+  id String @id @default(uuid())
+
+  invoiceNumber String @unique
+
+  bookingId String @unique
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  paymentId String @unique
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  customerId String
+  customer   User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  subtotal Decimal @db.Decimal(12, 2)
+  tax      Decimal @db.Decimal(12, 2) @default(0)
+  discount Decimal @db.Decimal(12, 2) @default(0)
+  total    Decimal @db.Decimal(12, 2)
+
+  currency String @default("USD")
+
+  status InvoiceStatus @default(ISSUED)
+
+  issuedAt DateTime @default(now())
+  paidAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+
+  @@map("invoices")
 }
