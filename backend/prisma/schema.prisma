@@ -427,6 +427,3 @@ model Payout {
 
   @@map("payouts")
 }
-
-
-
