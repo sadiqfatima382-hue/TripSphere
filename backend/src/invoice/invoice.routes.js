@@ -9,6 +9,8 @@ const router = express.Router();
 
 router.use(authenticate);
 
+router.get("/", authorizeRoles("ADMIN", "SUPPORT"), getAllInvoicesController);
+
 router.post("/", authorizeRoles("CUSTOMER"), validate(createInvoiceSchema), createInvoiceController);
 
 router.get("/my-invoices", authorizeRoles("CUSTOMER"), getMyInvoicesController);
@@ -18,7 +20,5 @@ router.get("/booking/:bookingId", authorizeRoles("CUSTOMER"), getInvoiceByBookin
 router.get("/payment/:paymentId", authorizeRoles("CUSTOMER"), getInvoiceByPaymentIdController);
 
 router.get("/:id", authorizeRoles("CUSTOMER"), getInvoiceByIdController);
-
-router.get("/", authorizeRoles("ADMIN", "SUPPORT"), getAllInvoicesController);
 
 export default router;
