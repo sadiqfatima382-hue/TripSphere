@@ -50,6 +50,20 @@ enum RefundStatus {
   CANCELLED
 }
 
+enum PayoutMethod {
+  BANK_TRANSFER
+  STRIPE
+  CASH
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  CANCELLED
+}
+
 model User {
   id String @id @default(uuid())
 
@@ -375,5 +389,41 @@ model Refund {
 
   @@map("refunds")
 }
+
+model Payout {
+  id String @id @default(uuid())
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  grossAmount      Decimal @db.Decimal(12, 2)
+  commissionAmount Decimal @db.Decimal(12, 2)
+  netAmount        Decimal @db.Decimal(12, 2)
+
+  currency String @default("USD")
+
+  method PayoutMethod
+  status PayoutStatus @default(PENDING)
+
+  transactionId String? @unique
+
+  processedAt DateTime?
+
+  failureReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bookingId])
+  @@index([vendorId])
+  @@index([status])
+  @@index([createdAt])
+
+  @@map("payouts")
+}
+
 
 
