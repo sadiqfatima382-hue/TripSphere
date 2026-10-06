@@ -13,6 +13,7 @@ import reviewRoutes from "./review/review.routes.js";
 import searchRoutes from "./searching/search.routes.js";
 import availabilityRoutes from "./availability/availability.routes.js";
 import refundRoutes from "./refund/refund.routes.js"
+import payoutRoutes from "./payout/payout.routes.js";
 const app = express();
 app.use("/api/v1/payments/stripe", stripeRoutes);
 app.use(helmet());
@@ -36,6 +37,7 @@ app.use("/api/v1/reviews", reviewRoutes);
 app.use("/api/v1/search", searchRoutes);
 app.use("/api/v1/availability", availabilityRoutes);
 app.use("/api/v1/refund", refundRoutes)
+app.use("/api/v1/payouts", payoutRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
