@@ -29,7 +29,7 @@ export async function createPayoutService(bookingId, vendorId, method) {
         );
     }
 
-    if (booking.status !== "COMPLETED") {
+    if (booking.status !== "CONFIRMED") {
         throw new Error(
             "Payout can only be created for a completed booking"
         );
