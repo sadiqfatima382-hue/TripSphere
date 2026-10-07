@@ -237,3 +237,80 @@ export async function updateInvoiceService(
 
     return updateInvoice(invoiceId, data);
 }
+
+export async function getInvoiceReceiptService(
+  invoiceId,
+  customerId
+) {
+  const invoice = await findInvoiceById(invoiceId);
+
+  if (!invoice) {
+    throw new Error("Invoice not found");
+  }
+
+  if (invoice.customerId !== customerId) {
+    throw new Error(
+      "You are not authorized to view this receipt"
+    );
+  }
+
+  if (!invoice.payment) {
+    throw new Error(
+      "Payment not found for this invoice"
+    );
+  }
+
+  if (invoice.payment.status !== "PAID") {
+    throw new Error(
+      "Receipt is only available for paid invoices"
+    );
+  }
+
+  const customerName = [
+    invoice.customer.firstName,
+    invoice.customer.lastName,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return {
+    receiptNumber: `RCT-${invoice.invoiceNumber.replace(
+      "INV-",
+      ""
+    )}`,
+
+    invoiceNumber: invoice.invoiceNumber,
+
+    bookingNumber: invoice.booking.bookingNumber,
+
+    customer: {
+      id: invoice.customer.id,
+      name: customerName,
+      email: invoice.customer.email,
+    },
+
+    service: {
+      id: invoice.booking.service.id,
+      name: invoice.booking.service.name,
+    },
+
+    payment: {
+      id: invoice.payment.id,
+      method: invoice.payment.method,
+      status: invoice.payment.status,
+      transactionId: invoice.payment.transactionId,
+      amount: invoice.payment.amount,
+      currency: invoice.payment.currency,
+      paidAt: invoice.payment.paidAt,
+    },
+
+    invoice: {
+      subtotal: invoice.subtotal,
+      tax: invoice.tax,
+      discount: invoice.discount,
+      total: invoice.total,
+      currency: invoice.currency,
+      issuedAt: invoice.issuedAt,
+    },
+  };
+}
