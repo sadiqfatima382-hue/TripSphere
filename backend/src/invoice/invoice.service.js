@@ -37,7 +37,7 @@ export async function createInvoiceService(
         );
     }
 
-    if (booking.status !== "COMPLETED") {
+    if (booking.status !== "CONFIRMED") {
         throw new Error(
             "Invoice can only be created for a completed booking"
         );
