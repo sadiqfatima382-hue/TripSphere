@@ -1,4 +1,4 @@
-import { createInvoiceService, getInvoiceByIdService, getInvoiceByBookingIdService, getInvoiceByPaymentIdService, getCustomerInvoicesService, getAllInvoicesService, } from "../invoice/invoice.service.js";
+import { createInvoiceService, getInvoiceByIdService, getInvoiceByBookingIdService, getInvoiceByPaymentIdService, getCustomerInvoicesService, getAllInvoicesService, getInvoiceReceiptService } from "../invoice/invoice.service.js";
 
 export async function createInvoiceController(req, res, next) {
     try {
@@ -110,6 +110,26 @@ export async function getAllInvoicesController(req, res, next) {
             success: true,
             data: result.invoices,
             pagination: result.pagination,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
+    }
+}
+
+export async function getInvoiceReceiptController(req, res, next) {
+    try {
+        const receipt = await getInvoiceReceiptService(
+            req.params.id,
+            req.user.id
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Receipt retrieved successfully",
+            data: receipt,
         });
     } catch (error) {
         return res.status(500).json({
