@@ -79,7 +79,9 @@ if (!customer){
 }
 
   const unitPrice = Number(service.basePrice);
-  const totalPrice = unitPrice * quantity;
+  const subtotal = unitPrice * quantity;
+const discountAmount = 0;
+const totalPrice = subtotal;
 
   const bookingNumber = generateBookingNumber();
 
@@ -92,6 +94,8 @@ if (!customer){
   endDate,
   quantity,
   unitPrice,
+  subtotal,
+  discountAmount,
   totalPrice,
   currency: service.currency,
   status: "PENDING",
