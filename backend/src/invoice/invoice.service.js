@@ -15,7 +15,6 @@ export async function createInvoiceService(
     customerId,
     bookingId
 ) {
-
     const booking = await prisma.booking.findUnique({
         where: {
             id: bookingId,
@@ -39,7 +38,7 @@ export async function createInvoiceService(
 
     if (booking.status !== "CONFIRMED") {
         throw new Error(
-            "Invoice can only be created for a completed booking"
+            "Invoice can only be created for a confirmed booking"
         );
     }
 
@@ -66,6 +65,18 @@ export async function createInvoiceService(
 
     const invoiceNumber = generateInvoiceNumber();
 
+    const subtotal = Number(
+        booking.subtotal ?? booking.totalPrice
+    );
+
+    const discount = Number(
+        booking.discountAmount ?? 0
+    );
+
+    const total = Number(
+        booking.totalPrice
+    );
+
     const invoice = await createInvoice({
         invoiceNumber,
 
@@ -75,13 +86,13 @@ export async function createInvoiceService(
 
         customerId: booking.customerId,
 
-        subtotal: booking.totalPrice,
+        subtotal,
 
         tax: 0,
 
-        discount: 0,
+        discount,
 
-        total: booking.totalPrice,
+        total,
 
         currency: booking.currency,
 
