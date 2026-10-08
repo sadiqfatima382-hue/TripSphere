@@ -134,158 +134,186 @@ export async function deleteCouponService(
 }
 
 export async function applyCouponService(
-    customerId,
-    bookingId,
-    code
+  customerId,
+  bookingId,
+  code
 ) {
-    const coupon = await findCouponByCode(
-        code.toUpperCase()
+  const coupon = await findCouponByCode(
+    code.toUpperCase()
+  );
+
+  if (!coupon) {
+    throw new Error("Invalid coupon code");
+  }
+
+  if (!coupon.isActive) {
+    throw new Error("Coupon is inactive");
+  }
+
+  const now = new Date();
+
+  if (now < coupon.startsAt) {
+    throw new Error("Coupon is not active yet");
+  }
+
+  if (now > coupon.expiresAt) {
+    throw new Error("Coupon has expired");
+  }
+
+  const booking = await prisma.booking.findUnique({
+    where: {
+      id: bookingId,
+    },
+  });
+
+  if (!booking) {
+    throw new Error("Booking not found");
+  }
+
+  if (booking.customerId !== customerId) {
+    throw new Error(
+      "You are not authorized to apply this coupon"
+    );
+  }
+
+  if (booking.status !== "PENDING") {
+    throw new Error(
+      "Coupon can only be applied to a pending booking"
+    );
+  }
+
+  const bookingAmount = Number(
+    booking.subtotal ?? booking.totalPrice
+  );
+
+  if (
+    coupon.minimumBookingAmount !== null &&
+    bookingAmount <
+      Number(coupon.minimumBookingAmount)
+  ) {
+    throw new Error(
+      `Minimum booking amount is ${coupon.minimumBookingAmount}`
+    );
+  }
+
+  if (coupon.usageLimit !== null) {
+    const totalUsages =
+      await countCouponUsages(coupon.id);
+
+    if (totalUsages >= coupon.usageLimit) {
+      throw new Error(
+        "Coupon usage limit has been reached"
+      );
+    }
+  }
+
+  if (coupon.usageLimitPerCustomer !== null) {
+    const customerUsages =
+      await countCustomerCouponUsages(
+        coupon.id,
+        customerId
+      );
+
+    if (
+      customerUsages >=
+      coupon.usageLimitPerCustomer
+    ) {
+      throw new Error(
+        "You have reached the usage limit for this coupon"
+      );
+    }
+  }
+
+  const existingUsage =
+    await findCouponUsageByBooking(
+      coupon.id,
+      bookingId
     );
 
-    if (!coupon) {
-        throw new Error("Invalid coupon code");
+  if (existingUsage) {
+    throw new Error(
+      "Coupon has already been applied to this booking"
+    );
+  }
+
+  let discountAmount = 0;
+
+  if (coupon.discountType === "PERCENTAGE") {
+    discountAmount =
+      bookingAmount *
+      (Number(coupon.discountValue) / 100);
+
+    if (coupon.maximumDiscountAmount !== null) {
+      discountAmount = Math.min(
+        discountAmount,
+        Number(coupon.maximumDiscountAmount)
+      );
     }
+  } else {
+    discountAmount = Number(
+      coupon.discountValue
+    );
+  }
 
-    if (!coupon.isActive) {
-        throw new Error("Coupon is inactive");
-    }
+  discountAmount = Math.min(
+    discountAmount,
+    bookingAmount
+  );
 
-    const now = new Date();
+  discountAmount = Number(
+    discountAmount.toFixed(2)
+  );
 
-    if (now < coupon.startsAt) {
-        throw new Error(
-            "Coupon is not active yet"
-        );
-    }
+  const finalAmount = Number(
+    (bookingAmount - discountAmount).toFixed(2)
+  );
 
-    if (now > coupon.expiresAt) {
-        throw new Error("Coupon has expired");
-    }
-
-    const booking = await prisma.booking.findUnique({
+  return prisma.$transaction(async (tx) => {
+    const updatedBooking =
+      await tx.booking.update({
         where: {
-            id: bookingId,
+          id: bookingId,
         },
+        data: {
+          subtotal: bookingAmount,
+          discountAmount,
+          totalPrice: finalAmount,
+        },
+      });
+
+    const usage =
+      await tx.couponUsage.create({
+        data: {
+          couponId: coupon.id,
+          customerId,
+          bookingId,
+          discountAmount,
+        },
+      });
+
+    await tx.coupon.update({
+      where: {
+        id: coupon.id,
+      },
+      data: {
+        usageCount: {
+          increment: 1,
+        },
+      },
     });
 
-    if (!booking) {
-        throw new Error("Booking not found");
-    }
-
-    if (booking.customerId !== customerId) {
-        throw new Error(
-            "You are not authorized to apply this coupon"
-        );
-    }
-
-    if (
-        booking.status !== "PENDING"
-    ) {
-        throw new Error(
-            "Coupon can only be applied to a pending booking"
-        );
-    }
-
-    const bookingAmount =
-        Number(booking.totalPrice);
-
-    if (
-        coupon.minimumBookingAmount !== null &&
-        bookingAmount <
-        Number(coupon.minimumBookingAmount)
-    ) {
-        throw new Error(
-            `Minimum booking amount is ${coupon.minimumBookingAmount}`
-        );
-    }
-
-    if (coupon.usageLimit !== null) {
-        const totalUsages =
-            await countCouponUsages(coupon.id);
-
-        if (
-            totalUsages >= coupon.usageLimit
-        ) {
-            throw new Error(
-                "Coupon usage limit has been reached"
-            );
-        }
-    }
-
-    if (
-        coupon.usageLimitPerCustomer !== null
-    ) {
-        const customerUsages =
-            await countCustomerCouponUsages(
-                coupon.id,
-                customerId
-            );
-
-        if (
-            customerUsages >=
-            coupon.usageLimitPerCustomer
-        ) {
-            throw new Error(
-                "You have reached the usage limit for this coupon"
-            );
-        }
-    }
-
-    const existingUsage =
-        await findCouponUsageByBooking(
-            coupon.id,
-            bookingId
-        );
-
-    if (existingUsage) {
-        throw new Error(
-            "Coupon has already been applied to this booking"
-        );
-    }
-
-    // Calculate discount
-    let discountAmount = 0;
-
-    if (
-        coupon.discountType === "PERCENTAGE"
-    ) {
-        discountAmount =
-            bookingAmount *
-            (Number(coupon.discountValue) / 100);
-
-        if (
-            coupon.maximumDiscountAmount !== null
-        ) {
-            discountAmount = Math.min(
-                discountAmount,
-                Number(
-                    coupon.maximumDiscountAmount
-                )
-            );
-        }
-    } else {
-        discountAmount = Number(
-            coupon.discountValue
-        );
-    }
-
-    discountAmount = Math.min(
-        discountAmount,
-        bookingAmount
-    );
-
-    const finalAmount =
-        bookingAmount - discountAmount;
-
     return {
-        couponId: coupon.id,
-        code: coupon.code,
-        bookingId,
-        originalAmount: bookingAmount,
-        discountAmount,
-        finalAmount,
-        currency: booking.currency,
+      couponId: coupon.id,
+      code: coupon.code,
+      bookingId,
+      originalAmount: bookingAmount,
+      discountAmount,
+      finalAmount,
+      currency: booking.currency,
+      booking: updatedBooking,
+      usage,
     };
+  });
 }
 
 export async function recordCouponUsageService(
