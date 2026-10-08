@@ -1,9 +1,15 @@
-/*
-  Warnings:
+-- Add columns as nullable first
+ALTER TABLE "bookings"
+ADD COLUMN "discountAmount" DECIMAL(12,2),
+ADD COLUMN "subtotal" DECIMAL(12,2);
 
-  - Added the required column `subtotal` to the `bookings` table without a default value. This is not possible if the table is not empty.
+-- Fill existing bookings
+UPDATE "bookings"
+SET
+  "subtotal" = "totalPrice",
+  "discountAmount" = 0;
 
-*/
--- AlterTable
-ALTER TABLE "bookings" ADD COLUMN     "discountAmount" DECIMAL(12,2) NOT NULL DEFAULT 0,
-ADD COLUMN     "subtotal" DECIMAL(12,2) NOT NULL;
+-- Make the columns required
+ALTER TABLE "bookings"
+ALTER COLUMN "subtotal" SET NOT NULL,
+ALTER COLUMN "discountAmount" SET NOT NULL;
