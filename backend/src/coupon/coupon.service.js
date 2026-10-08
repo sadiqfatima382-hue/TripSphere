@@ -1,3 +1,4 @@
+import prisma from "../config/prisma.js";
 import { createCoupon, findAllCoupons, findCouponByCode, findCouponById, updateCoupon, deleteCoupon, createCouponUsage,  findCouponUsageByBooking, findCouponUsageByCustomer, findCouponUsageById, countCustomerCouponUsages, countCouponUsages } from "../coupon/coupon.repository.js";
 
 export async function createCouponService(data) {
