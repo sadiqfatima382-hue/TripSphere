@@ -10,7 +10,10 @@ export async function createCouponController(req, res, next) {
             data: coupon,
         });
     } catch (error) {
-        next(error);
+         return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
 }
 
@@ -26,8 +29,12 @@ export async function getCouponByIdController(req, res, next) {
             data: coupon,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
+   
 }
 
 export async function getCouponByCodeController(req, res, next) {
@@ -42,8 +49,12 @@ export async function getCouponByCodeController(req, res, next) {
             data: coupon,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
+    
 }
 
 export async function getAllCouponsController(req, res, next) {
@@ -58,7 +69,11 @@ export async function getAllCouponsController(req, res, next) {
             data: result,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    
     }
 }
 
@@ -75,7 +90,11 @@ export async function updateCouponController(req, res, next) {
             data: coupon,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    
     }
 }
 
@@ -91,7 +110,11 @@ export async function deleteCouponController(req, res, next) {
             data: coupon,
         });
     } catch (error) {
-        next(error);
+       return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    
     }
 }
 
@@ -111,35 +134,11 @@ export async function applyCouponController(req, res, next) {
             data: result,
         });
     } catch (error) {
-        next(error);
-    }
-}
-
-export async function recordCouponUsageController(
-    req,
-    res,
-    next
-) {
-    try {
-        const {
-            bookingId,
-            couponId,
-            discountAmount,
-        } = req.body;
-
-        const usage = await recordCouponUsageService(
-            req.user.id,
-            bookingId,
-            couponId,
-            discountAmount
-        );
-
-        return res.status(201).json({
-            success: true,
-            message: "Coupon usage recorded successfully",
-            data: usage,
+        return res.status(500).json({
+            success: false,
+            message: error.message,
         });
-    } catch (error) {
-        next(error);
+    
     }
 }
+

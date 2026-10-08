@@ -19,6 +19,5 @@ router.delete("/:id", authenticate, authorizeRoles("ADMIN"), deleteCouponControl
 
 router.post("/apply", authenticate, authorizeRoles("CUSTOMER"), applyCouponController);
 
-router.post("/usage", authenticate, authorizeRoles("CUSTOMER"), recordCouponUsageController);
 
 export default router;
