@@ -1,4 +1,4 @@
-import { createCoupon, findAllCoupons, findCouponByCode, findCouponById, updateCoupon, deleteCoupon, createCouponUsage, countCouponUsages, findCouponUsageByBooking, findCouponUsageByCustomer, findCouponUsageById, countCustomerCouponUsages, countCouponUsages } from "./coupon.repository";
+import { createCoupon, findAllCoupons, findCouponByCode, findCouponById, updateCoupon, deleteCoupon, createCouponUsage,  findCouponUsageByBooking, findCouponUsageByCustomer, findCouponUsageById, countCustomerCouponUsages, countCouponUsages } from "../coupon/coupon.repository.js";
 
 export async function createCouponService(data) {
     const code = data.code.toUpperCase();
@@ -285,4 +285,71 @@ export async function applyCouponService(
         finalAmount,
         currency: booking.currency,
     };
+}
+
+export async function recordCouponUsageService(
+  customerId,
+  bookingId,
+  couponId,
+  discountAmount
+) {
+  const coupon = await findCouponById(couponId);
+
+  if (!coupon) {
+    throw new Error("Coupon not found");
+  }
+
+  const booking = await prisma.booking.findUnique({
+    where: {
+      id: bookingId,
+    },
+  });
+
+  if (!booking) {
+    throw new Error("Booking not found");
+  }
+
+  if (booking.customerId !== customerId) {
+    throw new Error(
+      "You are not authorized to use this coupon"
+    );
+  }
+
+  const existingUsage =
+    await findCouponUsageByBooking(
+      couponId,
+      bookingId
+    );
+
+  if (existingUsage) {
+    throw new Error(
+      "Coupon has already been used for this booking"
+    );
+  }
+
+  return prisma.$transaction(
+    async (tx) => {
+      const usage = await tx.couponUsage.create({
+        data: {
+          couponId,
+          customerId,
+          bookingId,
+          discountAmount,
+        },
+      });
+
+      await tx.coupon.update({
+        where: {
+          id: couponId,
+        },
+        data: {
+          usageCount: {
+            increment: 1,
+          },
+        },
+      });
+
+      return usage;
+    }
+  );
 }
