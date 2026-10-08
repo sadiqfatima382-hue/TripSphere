@@ -15,6 +15,7 @@ import availabilityRoutes from "./availability/availability.routes.js";
 import refundRoutes from "./refund/refund.routes.js"
 import payoutRoutes from "./payout/payout.routes.js";
 import invoiceRoutes from "./invoice/invoice.routes.js";
+import couponRoutes from "./coupon/coupon.routes.js";
 const app = express();
 app.use("/api/v1/payments/stripe", stripeRoutes);
 app.use(helmet());
@@ -40,6 +41,7 @@ app.use("/api/v1/availability", availabilityRoutes);
 app.use("/api/v1/refund", refundRoutes)
 app.use("/api/v1/payouts", payoutRoutes);
 app.use("/api/v1/invoices", invoiceRoutes);
+app.use("/api/v1/coupons", couponRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
