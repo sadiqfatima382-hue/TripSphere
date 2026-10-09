@@ -300,3 +300,46 @@ export async function getTopPerformingServices({ limit = 10 } = {}) {
   }));
 }
 
+export async function getTopPerformingVendors({ limit = 10 } = {}) {
+  const vendors = await prisma.vendor.findMany({
+    take: limit,
+    orderBy: {
+      bookings: {
+        _count: "desc",
+      },
+    },
+    select: {
+      id: true,
+      businessName: true,
+      status: true,
+      country: true,
+      city: true,
+      owner: {
+        select: {
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+      _count: {
+        select: {
+          bookings: true,
+          services: true,
+        },
+      },
+    },
+  });
+
+  return vendors.map((vendor) => ({
+    id: vendor.id,
+    businessName: vendor.businessName,
+    status: vendor.status,
+    country: vendor.country,
+    city: vendor.city,
+    owner: vendor.owner,
+    totalBookings: vendor._count.bookings,
+    totalServices: vendor._count.services,
+  }));
+}
+
+
