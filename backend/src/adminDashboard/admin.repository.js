@@ -261,3 +261,42 @@ export async function getAdminBookingTrends({ days = 7 } = {}) {
     })),
   };
 }
+
+export async function getTopPerformingServices({ limit = 10 } = {}) {
+  const services = await prisma.service.findMany({
+    take: limit,
+    orderBy: {
+      bookings: {
+        _count: "desc",
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      city: true,
+      country: true,
+      currency: true,
+      basePrice: true,
+      averageRating: true,
+      reviewCount: true,
+      _count: {
+        select: {
+          bookings: true,
+        },
+      },
+    },
+  });
+
+  return services.map((service) => ({
+    id: service.id,
+    name: service.name,
+    city: service.city,
+    country: service.country,
+    currency: service.currency,
+    basePrice: Number(service.basePrice),
+    averageRating: Number(service.averageRating),
+    reviewCount: service.reviewCount,
+    totalBookings: service._count.bookings,
+  }));
+}
+
