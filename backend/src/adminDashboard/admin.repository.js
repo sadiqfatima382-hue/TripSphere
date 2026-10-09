@@ -234,3 +234,30 @@ export async function getAdminRevenueStats() {
   };
 }
 
+export async function getAdminBookingTrends({ days = 7 } = {}) {
+  const startDate = new Date();
+  startDate.setUTCHours(0, 0, 0, 0);
+  startDate.setUTCDate(startDate.getUTCDate() - (days - 1));
+
+  const bookings = await prisma.$queryRaw`
+    SELECT
+      DATE_TRUNC('day', "createdAt") AS date,
+      COUNT(*)::int AS total
+    FROM "bookings"
+    WHERE "createdAt" >= ${startDate}
+    GROUP BY DATE_TRUNC('day', "createdAt")
+    ORDER BY date ASC
+  `;
+
+  return {
+    period: {
+      days,
+      startDate,
+      endDate: new Date(),
+    },
+    bookings: bookings.map((booking) => ({
+      date: booking.date,
+      total: booking.total,
+    })),
+  };
+}
