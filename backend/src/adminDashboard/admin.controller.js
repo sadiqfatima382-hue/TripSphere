@@ -1,4 +1,4 @@
-import { getAdminDashboardStatsService, getAdminRevenueService, getAdminBookingTrendsService } from "./admin.service.js";
+import { getAdminDashboardStatsService, getAdminRevenueService, getAdminBookingTrendsService,getTopPerformingServicesService } from "./admin.service.js";
 
 export async function getAdminDashboardStatsController(req, res, next) {
     try {
@@ -59,3 +59,27 @@ export async function getAdminBookingTrendsController(req, res, next) {
         })
     }
 }
+
+export async function getTopPerformingServicesController(req, res, next) {
+  try {
+    const limit = Number(req.query.limit ?? 10);
+
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Limit must be an integer between 1 and 100",
+      });
+    }
+
+    const result = await getTopPerformingServicesService(limit);
+
+    return res.status(200).json({
+      success: true,
+      message: "Top-performing services fetched successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
