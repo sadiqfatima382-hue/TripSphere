@@ -1,4 +1,4 @@
-import { getAdminDashboardStatsService } from "./admin.service.js";
+import { getAdminDashboardStatsService, getAdminRevenueService } from "./admin.service.js";
 
 export async function getAdminDashboardStatsController(req, res, next) {
     try {
@@ -15,4 +15,18 @@ export async function getAdminDashboardStatsController(req, res, next) {
         })
     }
 
+}
+
+export async function getAdminRevenueController(req, res, next) {
+  try {
+    const revenue = await getAdminRevenueService();
+
+    return res.status(200).json({
+      success: true,
+      message: "Admin revenue analytics fetched successfully",
+      data: revenue,
+    });
+  } catch (error) {
+    next(error);
+  }
 }
