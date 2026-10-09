@@ -9,9 +9,9 @@ export async function getAdminDashboardStatsController(req, res, next) {
             data: stats,
         });
     } catch (error) {
- return res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message:error.message,
+            message: error.message,
         })
     }
 
