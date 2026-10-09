@@ -1,4 +1,4 @@
-import { getAdminDashboardStatsService, getAdminRevenueService, getAdminBookingTrendsService,getTopPerformingServicesService ,getTopPerformingVendorsService} from "./admin.service.js";
+import { getAdminDashboardStatsService, getAdminRevenueService, getAdminBookingTrendsService,getTopPerformingServicesService ,getTopPerformingVendorsService ,getAdminStatusBreakdownService} from "./admin.service.js";
 
 export async function getAdminDashboardStatsController(req, res, next) {
     try {
@@ -79,7 +79,10 @@ export async function getTopPerformingServicesController(req, res, next) {
       data: result,
     });
   } catch (error) {
-    next(error);
+     return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
   }
 }
 
@@ -102,7 +105,27 @@ export async function getTopPerformingVendorsController(req, res, next) {
       data: result,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
+  }
+}
+
+export async function getAdminStatusBreakdownController(req, res, next) {
+  try {
+    const breakdown = await getAdminStatusBreakdownService();
+
+    return res.status(200).json({
+      success: true,
+      message: "Admin status breakdown fetched successfully",
+      data: breakdown,
+    });
+  } catch (error) {
+    return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
   }
 }
 
