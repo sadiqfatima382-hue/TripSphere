@@ -1,4 +1,4 @@
-import { getAdminDashboardStats, getAdminRevenueStats,getAdminBookingTrends,getTopPerformingServices } from "./admin.repository.js";
+import { getAdminDashboardStats, getAdminRevenueStats,getAdminBookingTrends,getTopPerformingServices,getTopPerformingVendors } from "./admin.repository.js";
 
 export async function getAdminDashboardStatsService() {
     const stats = await getAdminDashboardStats();
@@ -35,6 +35,17 @@ export async function getTopPerformingServicesService(limit = 10) {
     generatedAt: new Date(),
   };
 }
+
+export async function getTopPerformingVendorsService(limit = 10) {
+  const vendors = await getTopPerformingVendors({ limit });
+
+  return {
+    total: vendors.length,
+    vendors,
+    generatedAt: new Date(),
+  };
+}
+
 
 
 
