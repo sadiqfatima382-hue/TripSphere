@@ -1,4 +1,4 @@
-import { getAdminDashboardStats } from "./admin.repository.js";
+import { getAdminDashboardStats, getAdminRevenueStats } from "./admin.repository.js";
 
 export async function getAdminDashboardStatsService() {
     const stats = await getAdminDashboardStats();
@@ -8,3 +8,11 @@ export async function getAdminDashboardStatsService() {
         generatedAt: new Date(),
     }
 }
+
+export async function getAdminRevenueService() {
+    const revenue = await getAdminRevenueStats();
+    return {
+        ...revenue, generatedAt: new Date(),
+
+    }
+};
