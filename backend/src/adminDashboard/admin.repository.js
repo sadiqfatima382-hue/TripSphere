@@ -342,4 +342,42 @@ export async function getTopPerformingVendors({ limit = 10 } = {}) {
   }));
 }
 
+export async function getAdminStatusBreakdown() {
+  const [
+    bookingStatuses,
+    paymentStatuses,
+  ] = await Promise.all([
+    prisma.booking.groupBy({
+      by: ["status"],
+      _count: {
+        _all: true,
+      },
+    }),
+
+    prisma.payment.groupBy({
+      by: ["status"],
+      _count: {
+        _all: true,
+      },
+      _sum: {
+        amount: true,
+      },
+    }),
+  ]);
+
+  return {
+    bookings: bookingStatuses.map((item) => ({
+      status: item.status,
+      count: item._count._all,
+    })),
+
+    payments: paymentStatuses.map((item) => ({
+      status: item.status,
+      count: item._count._all,
+      amount: Number(item._sum.amount ?? 0),
+    })),
+  };
+}
+
+
 
