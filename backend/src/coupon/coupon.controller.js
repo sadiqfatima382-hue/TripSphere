@@ -1,4 +1,4 @@
-import { createCouponService, getCouponByIdService, getCouponByCodeService, getAllCouponsService, updateCouponService, deleteCouponService, applyCouponService, recordCouponUsageService, } from "../coupon/coupon.service.js";
+import { createCouponService, getCouponByIdService, getCouponByCodeService, getAllCouponsService, updateCouponService, deleteCouponService, applyCouponService,} from "../coupon/coupon.service.js";
 
 export async function createCouponController(req, res, next) {
     try {

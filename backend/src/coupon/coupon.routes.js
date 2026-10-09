@@ -1,5 +1,5 @@
 import express from "express";
-import { createCouponController, getCouponByIdController, getCouponByCodeController, getAllCouponsController, updateCouponController, deleteCouponController, applyCouponController, recordCouponUsageController, } from "../coupon/coupon.controller.js";
+import { createCouponController, getCouponByIdController, getCouponByCodeController, getAllCouponsController, updateCouponController, deleteCouponController, applyCouponController,} from "../coupon/coupon.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
 
