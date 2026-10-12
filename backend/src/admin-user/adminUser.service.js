@@ -1,4 +1,4 @@
-import {  findAllUsers,  findUserById, updateUserStatus, countActiveAdmins,findRoleByName,updateUserRole} from "./adminUser.repository.js";
+import { findAllUsers, findUserById, updateUserStatus, countActiveAdmins, findRoleByName, updateUserRole, findUserBookingHistory } from "./adminUser.repository.js";
 
 const allowedRoles = ["CUSTOMER", "VENDOR", "ADMIN", "SUPPORT"];
 
@@ -150,3 +150,44 @@ export async function updateUserRoleService(
   return updateUserRole(userId, role.id);
 }
 
+export async function getUserBookingHistoryService(
+  userId,
+  { page = 1, limit = 10 } = {}
+) {
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error("Page must be a positive integer");
+  }
+
+  if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+    throw new Error("Limit must be an integer between 1 and 100");
+  }
+
+  const user = await findUserById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const skip = (page - 1) * limit;
+
+  const { bookings, total } = await findUserBookingHistory(userId, {
+    skip,
+    take: limit,
+  });
+
+  return {
+    bookings,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page * limit < total,
+      hasPreviousPage: page > 1,
+    },
+  };
+}
