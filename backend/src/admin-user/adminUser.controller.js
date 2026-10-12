@@ -1,4 +1,4 @@
-import {  getAllUsersService,  getUserByIdService, updateUserStatusService, } from "./adminUser.service.js";
+import {  getAllUsersService,  getUserByIdService, updateUserStatusService, updateUserRoleService } from "./adminUser.service.js";
 
 export async function getAllUsersController(req, res, next) {
   try {
@@ -82,6 +82,36 @@ export async function updateUserStatusController(req, res, next) {
     });
   } catch (error) {
     return res.status(500).json({
+      success: false,
+      message: error.message,
+     })
+  }
+}
+
+export async function updateUserRoleController(req, res, next) {
+  try {
+    const { role } = req.body;
+
+    if (typeof role !== "string" || !role.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "A valid role is required",
+      });
+    }
+
+    const user = await updateUserRoleService(
+      req.params.id,
+      role.trim().toUpperCase(),
+      req.user.id
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "User role updated successfully",
+      data: user,
+    });
+  } catch (error) {
+     return res.status(500).json({
       success: false,
       message: error.message,
      })
