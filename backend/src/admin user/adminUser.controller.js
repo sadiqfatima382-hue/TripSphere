@@ -34,7 +34,10 @@ export async function getAllUsersController(req, res, next) {
       pagination: result.pagination,
     });
   } catch (error) {
-    next(error);
+     return res.status(500).json({
+      success: false,
+      message: error.message,
+     })
   }
 }
 
@@ -48,6 +51,9 @@ export async function getUserByIdController(req, res, next) {
       data: user,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+     })
   }
 }
