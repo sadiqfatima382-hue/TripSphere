@@ -140,3 +140,39 @@ export async function countActiveAdmins() {
   });
 }
 
+export async function findRoleByName(roleName) {
+  return prisma.role.findUnique({
+    where: {
+      name: roleName,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+}
+
+export async function updateUserRole(userId, roleId) {
+  return prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      roleId,
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      isActive: true,
+      role: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+}
+
