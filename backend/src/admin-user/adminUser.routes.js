@@ -1,5 +1,5 @@
 import express from "express";
-import {  getAllUsersController,  getUserByIdController, updateUserStatusController,updateUserRoleController} from "./adminUser.controller.js";
+import {  getAllUsersController,  getUserByIdController, updateUserStatusController,updateUserRoleController, getUserBookingHistoryController} from "./adminUser.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
 
@@ -12,6 +12,8 @@ router.get("/", getAllUsersController);
 router.patch("/:id/status", updateUserStatusController);
 
 router.patch("/:id/role", updateUserRoleController);
+
+router.get("/:id/bookings", getUserBookingHistoryController);
 
 router.get("/:id", getUserByIdController);
 

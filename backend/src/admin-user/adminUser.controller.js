@@ -1,4 +1,4 @@
-import {  getAllUsersService,  getUserByIdService, updateUserStatusService, updateUserRoleService } from "./adminUser.service.js";
+import { getAllUsersService, getUserByIdService, updateUserStatusService, updateUserRoleService, getUserBookingHistoryService } from "./adminUser.service.js";
 
 export async function getAllUsersController(req, res, next) {
   try {
@@ -34,10 +34,10 @@ export async function getAllUsersController(req, res, next) {
       pagination: result.pagination,
     });
   } catch (error) {
-     return res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
-     })
+    })
   }
 }
 
@@ -54,7 +54,7 @@ export async function getUserByIdController(req, res, next) {
     return res.status(500).json({
       success: false,
       message: error.message,
-     })
+    })
   }
 }
 
@@ -84,7 +84,7 @@ export async function updateUserStatusController(req, res, next) {
     return res.status(500).json({
       success: false,
       message: error.message,
-     })
+    })
   }
 }
 
@@ -111,10 +111,38 @@ export async function updateUserRoleController(req, res, next) {
       data: user,
     });
   } catch (error) {
-     return res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
-     })
+    })
+  }
+}
+
+export async function getUserBookingHistoryController(
+  req,
+  res,
+  next
+) {
+  try {
+    const page = Number(req.query.page ?? 1);
+    const limit = Number(req.query.limit ?? 10);
+
+    const result = await getUserBookingHistoryService(
+      req.params.id,
+      { page, limit }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "User booking history fetched successfully",
+      data: result.bookings,
+      pagination: result.pagination,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    })
   }
 }
 
