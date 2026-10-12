@@ -1,0 +1,64 @@
+import {  findAllUsers,  findUserById,} from "./adminUser.repository.js";
+
+const allowedRoles = ["CUSTOMER", "VENDOR", "ADMIN", "SUPPORT"];
+
+export async function getAllUsersService({
+  page = 1,
+  limit = 10,
+  search,
+  role,
+  isActive,
+} = {}) {
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error("Page must be a positive integer");
+  }
+
+  if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+    throw new Error("Limit must be an integer between 1 and 100");
+  }
+
+  if (role && !allowedRoles.includes(role)) {
+    throw new Error("Invalid user role");
+  }
+
+  if (isActive !== undefined && typeof isActive !== "boolean") {
+    throw new Error("isActive must be a boolean");
+  }
+
+  const skip = (page - 1) * limit;
+
+  const { users, total } = await findAllUsers({
+    skip,
+    take: limit,
+    search: search?.trim(),
+    role,
+    isActive,
+  });
+
+  return {
+    users,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page * limit < total,
+      hasPreviousPage: page > 1,
+    },
+  };
+}
+
+export async function getUserByIdService(userId) {
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+  const user = await findUserById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+}
+
