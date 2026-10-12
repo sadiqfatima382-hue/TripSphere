@@ -176,3 +176,68 @@ export async function updateUserRole(userId, roleId) {
   });
 }
 
+export async function findUserBookingHistory(
+  userId,
+  { skip = 0, take = 10 } = {}
+) {
+  const where = {
+    customerId: userId,
+  };
+
+  const [bookings, total] = await Promise.all([
+    prisma.booking.findMany({
+      where,
+      skip,
+      take,
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        bookingNumber: true,
+        startDate: true,
+        endDate: true,
+        quantity: true,
+        subtotal: true,
+        discountAmount: true,
+        totalPrice: true,
+        currency: true,
+        status: true,
+        createdAt: true,
+        service: {
+          select: {
+            id: true,
+            name: true,
+            city: true,
+            country: true,
+          },
+        },
+        vendor: {
+          select: {
+            id: true,
+            businessName: true,
+          },
+        },
+        payment: {
+          select: {
+            id: true,
+            amount: true,
+            currency: true,
+            method: true,
+            status: true,
+            paidAt: true,
+          },
+        },
+      },
+    }),
+
+    prisma.booking.count({ where }),
+  ]);
+
+  return {
+    bookings,
+    total,
+  };
+}
+
+
