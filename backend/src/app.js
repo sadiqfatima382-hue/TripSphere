@@ -43,7 +43,7 @@ app.use("/api/v1/refund", refundRoutes)
 app.use("/api/v1/payouts", payoutRoutes);
 app.use("/api/v1/invoices", invoiceRoutes);
 app.use("/api/v1/coupons", couponRoutes);
-app.use("/api/v1/AdminDashboard", adminRoutes);
+app.use("/api/v1/adminDashboard", adminRoutes);
 app.use("/api/v1/admin/users", adminUserRoutes);
 app.get("/", (req, res) => {
   res.json({

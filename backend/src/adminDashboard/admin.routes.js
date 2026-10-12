@@ -5,7 +5,7 @@ import { authorizeRoles } from "../middlewares/role.middleware.js"
 
 const router = express.Router()
 
-router.get( "/AdminDashboard", authenticate, authorizeRoles("ADMIN"), getAdminDashboardStatsController );
+router.get( "/adminDashboard", authenticate, authorizeRoles("ADMIN"), getAdminDashboardStatsController );
 
 router.get(  "/revenue",  authenticate,  authorizeRoles("ADMIN"),  getAdminRevenueController);
 
