@@ -1,4 +1,4 @@
-import {  findAllUsers,  findUserById, updateUserStatus, countActiveAdmins} from "./adminUser.repository.js";
+import {  findAllUsers,  findUserById, updateUserStatus, countActiveAdmins,findRoleByName,updateUserRole} from "./adminUser.repository.js";
 
 const allowedRoles = ["CUSTOMER", "VENDOR", "ADMIN", "SUPPORT"];
 
@@ -102,5 +102,51 @@ export async function updateUserStatusService(
   }
 
   return updateUserStatus(userId, isActive);
+}
+
+export async function updateUserRoleService(
+  userId,
+  roleName,
+  adminId
+) {
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+  if (!allowedRoles.includes(roleName)) {
+    throw new Error("Invalid user role");
+  }
+
+  const user = await findUserById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (user.role.name === roleName) {
+    throw new Error("User already has this role");
+  }
+
+  if (userId === adminId) {
+    throw new Error("You cannot change your own role");
+  }
+
+  if (user.isActive && user.role.name === "ADMIN") {
+    const activeAdminCount = await countActiveAdmins();
+
+    if (activeAdminCount <= 1) {
+      throw new Error(
+        "Cannot change the role of the last active administrator"
+      );
+    }
+  }
+
+  const role = await findRoleByName(roleName);
+
+  if (!role) {
+    throw new Error("Role not found");
+  }
+
+  return updateUserRole(userId, role.id);
 }
 
