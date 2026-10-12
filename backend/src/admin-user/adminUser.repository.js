@@ -10,34 +10,34 @@ export async function findAllUsers({
   const where = {
     ...(search
       ? {
-          OR: [
-            {
-              firstName: {
-                contains: search,
-                mode: "insensitive",
-              },
+        OR: [
+          {
+            firstName: {
+              contains: search,
+              mode: "insensitive",
             },
-            {
-              lastName: {
-                contains: search,
-                mode: "insensitive",
-              },
+          },
+          {
+            lastName: {
+              contains: search,
+              mode: "insensitive",
             },
-            {
-              email: {
-                contains: search,
-                mode: "insensitive",
-              },
+          },
+          {
+            email: {
+              contains: search,
+              mode: "insensitive",
             },
-          ],
-        }
+          },
+        ],
+      }
       : {}),
     ...(role
       ? {
-          role: {
-            name: role,
-          },
-        }
+        role: {
+          name: role,
+        },
+      }
       : {}),
     ...(isActive !== undefined ? { isActive } : {}),
   };
@@ -101,6 +101,40 @@ export async function findUserById(userId) {
           businessName: true,
           status: true,
         },
+      },
+    },
+  });
+}
+
+export async function updateUserStatus(userId, isActive) {
+  return prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      isActive,
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      isActive: true,
+      role: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+}
+
+export async function countActiveAdmins() {
+  return prisma.user.count({
+    where: {
+      isActive: true,
+      role: {
+        name: "ADMIN",
       },
     },
   });

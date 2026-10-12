@@ -3,7 +3,7 @@ import { getAdminDashboardStatsController, getAdminRevenueController,getAdminBoo
 import { authenticate } from "../middlewares/auth.middleware.js"
 import { authorizeRoles } from "../middlewares/role.middleware.js"
 
-const router = express.Router()
+const router = express.Router();
 
 router.get( "/adminDashboard", authenticate, authorizeRoles("ADMIN"), getAdminDashboardStatsController );
 
