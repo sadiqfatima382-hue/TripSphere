@@ -87,12 +87,10 @@ export async function updateUserStatusService(
     );
   }
 
-  // Prevent an admin from deactivating their own account.
   if (!isActive && userId === adminId) {
     throw new Error("You cannot deactivate your own account");
   }
 
-  // Prevent deactivation of the last active administrator.
   if (!isActive && user.role.name === "ADMIN") {
     const activeAdminCount = await countActiveAdmins();
 

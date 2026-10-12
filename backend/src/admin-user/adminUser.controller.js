@@ -1,4 +1,4 @@
-import {  getAllUsersService,  getUserByIdService,} from "./adminUser.service.js";
+import {  getAllUsersService,  getUserByIdService, updateUserStatusService, } from "./adminUser.service.js";
 
 export async function getAllUsersController(req, res, next) {
   try {
@@ -57,3 +57,34 @@ export async function getUserByIdController(req, res, next) {
      })
   }
 }
+
+export async function updateUserStatusController(req, res, next) {
+  try {
+    const { isActive } = req.body;
+
+    if (typeof isActive !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "isActive must be a boolean",
+      });
+    }
+
+    const user = await updateUserStatusService(
+      req.params.id,
+      isActive,
+      req.user.id
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `User ${isActive ? "activated" : "deactivated"} successfully`,
+      data: user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+     })
+  }
+}
+
