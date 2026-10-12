@@ -1,4 +1,4 @@
-import {  findAllUsers,  findUserById,} from "./adminUser.repository.js";
+import {  findAllUsers,  findUserById, updateUserStatus, countActiveAdmins} from "./adminUser.repository.js";
 
 const allowedRoles = ["CUSTOMER", "VENDOR", "ADMIN", "SUPPORT"];
 
@@ -60,5 +60,49 @@ export async function getUserByIdService(userId) {
   }
 
   return user;
+}
+
+export async function updateUserStatusService(
+  userId,
+  isActive,
+  adminId
+) {
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+  if (typeof isActive !== "boolean") {
+    throw new Error("isActive must be a boolean");
+  }
+
+  const user = await findUserById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (user.isActive === isActive) {
+    throw new Error(
+      `User account is already ${isActive ? "active" : "inactive"}`
+    );
+  }
+
+  // Prevent an admin from deactivating their own account.
+  if (!isActive && userId === adminId) {
+    throw new Error("You cannot deactivate your own account");
+  }
+
+  // Prevent deactivation of the last active administrator.
+  if (!isActive && user.role.name === "ADMIN") {
+    const activeAdminCount = await countActiveAdmins();
+
+    if (activeAdminCount <= 1) {
+      throw new Error(
+        "Cannot deactivate the last active administrator"
+      );
+    }
+  }
+
+  return updateUserStatus(userId, isActive);
 }
 
