@@ -18,6 +18,7 @@ import invoiceRoutes from "./invoice/invoice.routes.js";
 import couponRoutes from "./coupon/coupon.routes.js";
 import adminRoutes from "./adminDashboard/admin.routes.js";
 import adminUserRoutes from "./admin-user/adminUser.routes.js"
+import vendorDashboardRoutes from "./vendorDashboard/vendorDashboard.routes.js"
 const app = express();
 app.use("/api/v1/payments/stripe", stripeRoutes);
 app.use(helmet());
@@ -45,6 +46,7 @@ app.use("/api/v1/invoices", invoiceRoutes);
 app.use("/api/v1/coupons", couponRoutes);
 app.use("/api/v1/adminDashboard", adminRoutes);
 app.use("/api/v1/admin/users", adminUserRoutes);
+app.use("/api/v1/vendor/dashboard", vendorDashboardRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
