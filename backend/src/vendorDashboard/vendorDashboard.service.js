@@ -1,4 +1,4 @@
-import {  getVendorDashboardStats,} from "./vendorDashboard.repository.js";
+import {  getVendorDashboardStats, getVendorRevenueStats,} from "./vendorDashboard.repository.js";
 
 export async function getVendorDashboardService(vendorId) {
   if (!vendorId) {
@@ -14,3 +14,16 @@ export async function getVendorDashboardService(vendorId) {
   };
 }
 
+export async function getVendorDashboardRevenueService(vendorId) {
+  if (!vendorId){
+    throw new Error("Vendor ID is required");
+    }
+
+    const stats = await getVendorRevenueStats(vendorId);
+
+    return {
+      revenue: stats.revenue, 
+      payouts: stats.payouts,
+    }
+  
+}
