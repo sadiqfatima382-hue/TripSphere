@@ -119,3 +119,89 @@ export async function getVendorDashboardStats(vendorId) {
     };
 }
 
+export async function getVendorRevenueStats(vendorId) {
+    const [
+        paymentsByCurrency,
+        refundsByCurrency,
+        payoutsByCurrency,
+    ] = await Promise.all([
+
+        prisma.payment.groupBy({
+            by: ["currency"],
+            where: {
+                status: {
+                    in: ["PAID", "REFUNDED"],
+                },
+                booking: {
+                    vendorId,
+                },
+            },
+            _sum: {
+                amount: true,
+            },
+            _count: {
+                _all: true,
+            },
+        }),
+
+        prisma.refund.groupBy({
+            by: ["currency"],
+            where: {
+                status: "SUCCEEDED",
+                payment: {
+                    booking: {
+                        vendorId,
+                    },
+                },
+            },
+            _sum: {
+                amount: true,
+            },
+        }),
+
+        prisma.payout.groupBy({
+            by: ["currency", "status"],
+            where: {
+                vendorId,
+            },
+            _sum: {
+                grossAmount: true,
+                commissionAmount: true,
+                netAmount: true,
+            },
+        }),
+    ]);
+
+    const revenue = paymentsByCurrency.map((paymentGroup) => {
+        const currency = paymentGroup.currency;
+
+        const refundedAmount =
+            refundsByCurrency.find(
+                (refundGroup) => refundGroup.currency === currency
+            )?._sum.amount ?? 0;
+
+        const grossRevenue = paymentGroup._sum.amount ?? 0;
+
+        return {
+            currency,
+            paymentCount: paymentGroup._count._all,
+            grossRevenue,
+            refundedAmount,
+            netRevenue: Number(grossRevenue) - Number(refundedAmount),
+        };
+    });
+
+    const payouts = payoutsByCurrency.map((payoutGroup) => ({
+        currency: payoutGroup.currency,
+        status: payoutGroup.status,
+        grossAmount: payoutGroup._sum.grossAmount ?? 0,
+        commissionAmount: payoutGroup._sum.commissionAmount ?? 0,
+        netAmount: payoutGroup._sum.netAmount ?? 0,
+    }));
+
+    return {
+        revenue,
+        payouts,
+    };
+}
+
