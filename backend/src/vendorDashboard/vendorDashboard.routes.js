@@ -1,5 +1,5 @@
 import express from "express";
-import {  getVendorDashboardController, getVendorRevenueController} from "./vendorDashboard.controller.js";
+import { getVendorDashboardController, getVendorRevenueController } from "./vendorDashboard.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
 

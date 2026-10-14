@@ -1,4 +1,4 @@
-import {  getVendorDashboardService, getVendorDashboardRevenueService} from "./vendorDashboard.service.js";
+import { getVendorDashboardService, getVendorDashboardRevenueService } from "./vendorDashboard.service.js";
 
 export async function getVendorDashboardController(req, res, next) {
   try {
