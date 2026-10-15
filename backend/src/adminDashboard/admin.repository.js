@@ -379,5 +379,151 @@ export async function getAdminStatusBreakdown() {
   };
 }
 
+export async function getAdminFinancialOverview() {
+  const [
+    paymentsByCurrency,
+    refundsByCurrency,
+    payoutsByCurrencyAndStatus,
+  ] = await Promise.all([
+    // Customer payments received or subsequently refunded
+    prisma.payment.groupBy({
+      by: ["currency", "status"],
+      where: {
+        status: {
+          in: ["PAID", "REFUNDED"],
+        },
+      },
+      _sum: {
+        amount: true,
+      },
+      _count: {
+        _all: true,
+      },
+    }),
+
+    // Successfully processed refunds
+    prisma.refund.groupBy({
+      by: ["currency"],
+      where: {
+        status: "SUCCEEDED",
+      },
+      _sum: {
+        amount: true,
+      },
+      _count: {
+        _all: true,
+      },
+    }),
+
+    // Vendor financial allocations by payout status
+    prisma.payout.groupBy({
+      by: ["currency", "status"],
+      _sum: {
+        grossAmount: true,
+        commissionAmount: true,
+        netAmount: true,
+      },
+      _count: {
+        _all: true,
+      },
+    }),
+  ]);
+
+  const currencies = [
+    ...new Set([
+      ...paymentsByCurrency.map((item) => item.currency),
+      ...refundsByCurrency.map((item) => item.currency),
+      ...payoutsByCurrencyAndStatus.map((item) => item.currency),
+    ]),
+  ];
+
+  const financials = currencies.map((currency) => {
+    const payments = paymentsByCurrency.filter(
+      (item) => item.currency === currency
+    );
+
+    const refunds = refundsByCurrency.find(
+      (item) => item.currency === currency
+    );
+
+    const payouts = payoutsByCurrencyAndStatus.filter(
+      (item) => item.currency === currency
+    );
+
+    const grossRevenue = payments.reduce(
+      (total, item) => total + Number(item._sum.amount ?? 0),
+      0
+    );
+
+    const paidPaymentCount = payments.reduce(
+      (total, item) => total + item._count._all,
+      0
+    );
+
+    const refundedAmount = Number(refunds?._sum.amount ?? 0);
+
+    const payoutTotals = {
+      platformCommissionAllocated: 0,
+      vendorNetEarningsAllocated: 0,
+      paidToVendors: 0,
+      outstandingVendorLiability: 0,
+      pendingPayouts: 0,
+      processingPayouts: 0,
+      failedPayouts: 0,
+      paidPayoutCount: 0,
+    };
+
+    for (const payout of payouts) {
+      const commission = Number(
+        payout._sum.commissionAmount ?? 0
+      );
+
+      const netAmount = Number(
+        payout._sum.netAmount ?? 0
+      );
+
+      payoutTotals.platformCommissionAllocated += commission;
+      payoutTotals.vendorNetEarningsAllocated += netAmount;
+
+      if (payout.status === "PAID") {
+        payoutTotals.paidToVendors += netAmount;
+        payoutTotals.paidPayoutCount += payout._count._all;
+      }
+
+      if (
+        ["PENDING", "PROCESSING", "FAILED"].includes(
+          payout.status
+        )
+      ) {
+        payoutTotals.outstandingVendorLiability += netAmount;
+      }
+
+      if (payout.status === "PENDING") {
+        payoutTotals.pendingPayouts += netAmount;
+      }
+
+      if (payout.status === "PROCESSING") {
+        payoutTotals.processingPayouts += netAmount;
+      }
+
+      if (payout.status === "FAILED") {
+        payoutTotals.failedPayouts += netAmount;
+      }
+    }
+
+    return {
+      currency,
+      grossRevenue,
+      refundedAmount,
+      netRevenue: grossRevenue - refundedAmount,
+      paidPaymentCount,
+      ...payoutTotals,
+    };
+  });
+
+  return financials;
+}
+
+
 
 
