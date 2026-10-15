@@ -1,4 +1,4 @@
-import { getVendorDashboardStats, getVendorRevenueStats, getVendorBookingAnalytics } from "./vendorDashboard.repository.js";
+import { getVendorDashboardStats, getVendorRevenueStats, getVendorBookingAnalytics, getVendorServicePerformance } from "./vendorDashboard.repository.js";
 
 export async function getVendorDashboardService(vendorId) {
   if (!vendorId) {
@@ -33,3 +33,12 @@ export async function getVendorBookingAnalyticsService(vendorId , days=30) {
   return getVendorBookingAnalytics(vendorId, days)
   
 }
+
+export async function getVendorServicePerformanceService(vendorId, limit = 10) {
+  if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+    throw new Error("Limit must be an integer between 1 and 100");
+  }
+
+  return getVendorServicePerformance(vendorId, limit);
+}
+
