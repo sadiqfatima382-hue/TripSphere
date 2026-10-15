@@ -81,3 +81,31 @@ export async function getVendorBookingAnalyticsController(req, res, next) {
   }
 }
 
+export async function getVendorServicePerformanceController(req, res, next) {
+  try {
+    const limit = Number(req.query.limit ?? 10);
+
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Limit must be an integer between 1 and 100",
+      });
+    }
+
+    const services = await getVendorServicePerformanceService(
+      req.user.vendorId,
+      limit
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Vendor service performance fetched successfully",
+      data: services,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    })
+  }
+}
