@@ -1,4 +1,4 @@
-import { getAdminDashboardStatsService, getAdminRevenueService, getAdminBookingTrendsService,getTopPerformingServicesService ,getTopPerformingVendorsService ,getAdminStatusBreakdownService} from "./admin.service.js";
+import { getAdminDashboardStatsService, getAdminRevenueService, getAdminBookingTrendsService,getTopPerformingServicesService ,getTopPerformingVendorsService ,getAdminStatusBreakdownService, getAdminFinancialOverviewService} from "./admin.service.js";
 
 export async function getAdminDashboardStatsController(req, res, next) {
     try {
@@ -127,5 +127,22 @@ export async function getAdminStatusBreakdownController(req, res, next) {
             message: error.message,
         })
   }
+}
+
+export async function getAdminFinancialOverviewController(req, res, next) {
+  try {
+    const financials = await getAdminFinancialOverviewService();
+
+    return res.status(200).json({
+      success: true,
+      message: "Admin financial overview fetched successfully",
+      data: financials,
+    });
+  } catch (error) {
+    return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
+    }
 }
 
