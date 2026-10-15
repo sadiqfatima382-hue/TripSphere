@@ -205,3 +205,71 @@ export async function getVendorRevenueStats(vendorId) {
     };
 }
 
+export async function getVendorBookingAnalytics(vendorId, days = 30) {
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  startDate.setHours(0, 0, 0, 0);
+
+  const [
+    totalBookings,
+    pendingBookings,
+    confirmedBookings,
+    completedBookings,
+    cancelledBookings,
+    bookingTrends,
+  ] = await Promise.all([
+    prisma.booking.count({
+      where: { vendorId },
+    }),
+
+    prisma.booking.count({
+      where: { vendorId, status: "PENDING" },
+    }),
+
+    prisma.booking.count({
+      where: { vendorId, status: "CONFIRMED" },
+    }),
+
+    prisma.booking.count({
+      where: { vendorId, status: "COMPLETED" },
+    }),
+
+    prisma.booking.count({
+      where: { vendorId, status: "CANCELLED" },
+    }),
+
+    prisma.booking.groupBy({
+      by: ["createdAt"],
+      where: {
+        vendorId,
+        createdAt: { gte: startDate },
+      },
+      _count: {
+        _all: true,
+      },
+    }),
+  ]);
+
+  return {
+    periodDays: days,
+    totalBookings,
+    pendingBookings,
+    confirmedBookings,
+    completedBookings,
+    cancelledBookings,
+    confirmationRate:
+      totalBookings > 0
+        ? Number(
+            ((confirmedBookings / totalBookings) * 100).toFixed(2)
+          )
+        : 0,
+    cancellationRate:
+      totalBookings > 0
+        ? Number(
+            ((cancelledBookings / totalBookings) * 100).toFixed(2)
+          )
+        : 0,
+    bookingTrends,
+  };
+}
+
