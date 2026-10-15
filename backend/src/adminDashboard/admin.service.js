@@ -1,20 +1,20 @@
-import { getAdminDashboardStats, getAdminRevenueStats,getAdminBookingTrends,getTopPerformingServices,getTopPerformingVendors,getAdminStatusBreakdown } from "./admin.repository.js";
+import { getAdminDashboardStats, getAdminRevenueStats, getAdminBookingTrends, getTopPerformingServices, getTopPerformingVendors, getAdminStatusBreakdown, getAdminFinancialOverview } from "./admin.repository.js";
 
 export async function getAdminDashboardStatsService() {
-    const stats = await getAdminDashboardStats();
+  const stats = await getAdminDashboardStats();
 
-    return {
-        ...stats,
-        generatedAt: new Date(),
-    }
+  return {
+    ...stats,
+    generatedAt: new Date(),
+  }
 };
 
 export async function getAdminRevenueService() {
-    const revenue = await getAdminRevenueStats();
-    return {
-        ...revenue, generatedAt: new Date(),
+  const revenue = await getAdminRevenueStats();
+  return {
+    ...revenue, generatedAt: new Date(),
 
-    }
+  }
 };
 
 export async function getAdminBookingTrendsService(days = 7) {
@@ -55,6 +55,13 @@ export async function getAdminStatusBreakdownService() {
   };
 }
 
+export async function getAdminFinancialOverviewService() {
+  const financials = await getAdminFinancialOverview();
+
+  return {
+    financials
+  };
+}
 
 
 
