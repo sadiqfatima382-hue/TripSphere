@@ -1,5 +1,5 @@
 import express from "express"
-import { getAdminDashboardStatsController, getAdminRevenueController,getAdminBookingTrendsController,getTopPerformingServicesController,getTopPerformingVendorsController,getAdminStatusBreakdownController } from "./admin.controller.js"
+import { getAdminDashboardStatsController, getAdminRevenueController,getAdminBookingTrendsController,getTopPerformingServicesController,getTopPerformingVendorsController,getAdminStatusBreakdownController, getAdminFinancialOverviewController } from "./admin.controller.js"
 import { authenticate } from "../middlewares/auth.middleware.js"
 import { authorizeRoles } from "../middlewares/role.middleware.js"
 
@@ -16,5 +16,7 @@ router.get(  "/top-services",  authenticate,  authorizeRoles("ADMIN"),  getTopPe
 router.get(  "/top-vendors",  authenticate,  authorizeRoles("ADMIN"),  getTopPerformingVendorsController);
 
 router.get(  "/status-breakdown",  authenticate,  authorizeRoles("ADMIN"),  getAdminStatusBreakdownController);
+
+router.get(  "/financial-overview",  authenticate,  authorizeRoles("ADMIN"),  getAdminFinancialOverviewController);
 
 export default router;
