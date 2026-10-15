@@ -1,4 +1,4 @@
-import { getVendorDashboardStats, getVendorRevenueStats, } from "./vendorDashboard.repository.js";
+import { getVendorDashboardStats, getVendorRevenueStats, getVendorBookingAnalytics } from "./vendorDashboard.repository.js";
 
 export async function getVendorDashboardService(vendorId) {
   if (!vendorId) {
@@ -26,4 +26,10 @@ export async function getVendorDashboardRevenueService(vendorId) {
     payouts: stats.payouts,
   }
 
+}
+
+export async function getVendorBookingAnalyticsService(vendorId , days=30) {
+
+  return getVendorBookingAnalytics(vendorId, days)
+  
 }
