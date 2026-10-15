@@ -276,5 +276,81 @@ export async function getVendorBookingAnalytics(vendorId, days = 30) {
   };
 }
 
+export async function getVendorServicePerformance(vendorId, limit = 10) {
+  const services = await prisma.service.findMany({
+    where: {
+      vendorId,
+    },
+    select: {
+      id: true,
+      name: true,
+      status: true,
+      isActive: true,
+      basePrice: true,
+      currency: true,
+      averageRating: true,
+      reviewCount: true,
+      _count: {
+        select: {
+          bookings: true,
+        },
+      },
+      bookings: {
+        select: {
+          status: true,
+          totalPrice: true,
+          currency: true,
+        },
+      },
+    },
+  });
+
+  return services
+    .map((service) => {
+      const bookings = service.bookings;
+
+      const completedBookings = bookings.filter(
+        (booking) => booking.status === "COMPLETED"
+      ).length;
+
+      const confirmedBookings = bookings.filter(
+        (booking) => booking.status === "CONFIRMED"
+      ).length;
+
+      const cancelledBookings = bookings.filter(
+        (booking) => booking.status === "CANCELLED"
+      ).length;
+
+      const grossBookingValue = bookings
+        .filter((booking) =>
+          ["CONFIRMED", "COMPLETED"].includes(booking.status)
+        )
+        .reduce(
+          (total, booking) =>
+            total + Number(booking.totalPrice),
+          0
+        );
+
+      return {
+        id: service.id,
+        name: service.name,
+        status: service.status,
+        isActive: service.isActive,
+        basePrice: Number(service.basePrice),
+        currency: service.currency,
+        averageRating: Number(service.averageRating),
+        reviewCount: service.reviewCount,
+        totalBookings: service._count.bookings,
+        confirmedBookings,
+        completedBookings,
+        cancelledBookings,
+        grossBookingValue,
+      };
+    })
+    .sort((a, b) => b.totalBookings - a.totalBookings)
+    .slice(0, limit);
+}
+
+
 
 
