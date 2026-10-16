@@ -49,3 +49,46 @@ export async function getCustomerDashboardStats(customerId) {
         cancelledBookings,
     };
 }
+
+export async function getCustomerUpcomingBookings(customerId, limit = 5) {
+  return prisma.booking.findMany({
+    where: {
+      customerId,
+      status: {
+        in: ["PENDING", "CONFIRMED"],
+      },
+      startDate: {
+        gte: new Date(),
+      },
+    },
+    select: {
+      id: true,
+      bookingNumber: true,
+      startDate: true,
+      endDate: true,
+      quantity: true,
+      totalPrice: true,
+      currency: true,
+      status: true,
+      service: {
+        select: {
+          id: true,
+          name: true,
+          city: true,
+          country: true,
+        },
+      },
+      vendor: {
+        select: {
+          id: true,
+          businessName: true,
+        },
+      },
+    },
+    orderBy: {
+      startDate: "asc",
+    },
+    take: limit,
+  });
+}
+
