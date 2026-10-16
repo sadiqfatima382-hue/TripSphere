@@ -1,4 +1,4 @@
-import { getCustomerDashboardService, } from "./customer.service.js";
+import { getCustomerDashboardService, getCustomerUpcomingBookingsService} from "./customer.service.js";
 
 export async function getCustomerDashboardController(req, res, next) {
     try {
