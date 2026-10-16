@@ -92,3 +92,42 @@ export async function getCustomerUpcomingBookings(customerId, limit = 5) {
   });
 }
 
+export async function getCustomerRecentBookings(customerId, limit = 5) {
+  return prisma.booking.findMany({
+    where: {
+      customerId,
+    },
+    select: {
+      id: true,
+      bookingNumber: true,
+      startDate: true,
+      endDate: true,
+      quantity: true,
+      subtotal: true,
+      discountAmount: true,
+      totalPrice: true,
+      currency: true,
+      status: true,
+      createdAt: true,
+      service: {
+        select: {
+          id: true,
+          name: true,
+          city: true,
+          country: true,
+        },
+      },
+      vendor: {
+        select: {
+          id: true,
+          businessName: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: limit,
+  });
+}
+
