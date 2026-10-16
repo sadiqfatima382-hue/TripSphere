@@ -1,14 +1,10 @@
 import express from "express";
-import { authenticate, authorizeRoles } from "../middlewares/auth.middleware.js";
+import { authenticate } from "../middlewares/auth.middleware.js";
+import { authorizeRoles } from "../middlewares/role.middleware.js"
 import { getCustomerDashboardController, } from "./customer.controller.js";
 
-const router = expressRouter();
+const router = express.Router();
 
-router.get(
-    "/",
-    authenticate,
-    authorizeRoles("CUSTOMER"),
-    getCustomerDashboardController
-);
+router.get("/", authenticate, authorizeRoles("CUSTOMER"), getCustomerDashboardController);
 
 export default router;
